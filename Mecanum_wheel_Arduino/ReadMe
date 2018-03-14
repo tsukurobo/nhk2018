@@ -1,0 +1,11 @@
+I2CwithAVR:あいぴー先輩が書いたArduinoとモータドライバのAVRの通信のプログラム
+
+Int32MultiArray_Publisher:Int32MultiArray型のデータをROSにパブするプログラム
+
+Int32MultiArray_Subscriber:Int32MultiArray型のデータをROSからサブするプログラム
+
+MultiSubscriber:ROSからサブしたInt32MultiArray型のデータをそのままROSにパブするプログラム
+
+motor_multi:ROSのtr_multiからパブされたホイールの制御量をAVRに送るプログラム
+
+これらのプログラムはros_libを使います。
