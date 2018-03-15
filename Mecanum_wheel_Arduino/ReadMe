@@ -8,4 +8,6 @@ MultiSubscriber:ROSからサブしたInt32MultiArray型のデータをそのま�
 
 motor_multi:ROSのtr_multiからパブされたホイールの制御量をAVRに送るプログラム
 
+motor_mecanum:上記motor_multiの改変。エンコーダを用いてpid制御している
+
 これらのプログラムはros_libを使います。
