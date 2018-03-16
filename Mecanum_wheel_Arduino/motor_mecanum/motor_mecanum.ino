@@ -2,34 +2,6 @@
  * rosserial Publisher Example
  *test of Publishing Multi Array
  */
- 
- 
- 
- 
- 
- 
- 
- 
- //decide value of the n before use
- //
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
 #include <stdio.h>
 #include <ros.h>
 #include <std_msgs/Int8MultiArray.h>
@@ -100,6 +72,11 @@ void loop()
     e3[j]=e1[j]-e4[j];
     e4[j]=e1[j];
     pw[j]=p*e1[j]+i*e2[j]+d*e3[j];
+    if(abs(pw[j])>100){
+      pw[j]=100*pw[j]/abs(pw[j]);
+    }
+    else{
+    }
   }
   
   m1.setSpeed(pw[1]);
