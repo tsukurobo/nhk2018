@@ -70,18 +70,30 @@ ImageConverter()
     }
 
     //（使うものの宣言？）
-    cv::Mat hsv_image, color_mask, gray_image, cv_image2, cv_image3;
+    cv::Mat hsv_image, color_mask, gray_image, cv_image3;
 
     // cv_ptrをRGB表色系からHSV表色系へ変換して、hsv_imageに格納
     cv::cvtColor(cv_ptr->image, hsv_image, CV_BGR2HSV);
+
+
+
+
+
+
+    cv::Rect range(50, 50, 100, 100);
+    //画像のトリミング範囲を指定
+    //hsv_imageのトリミング済みのものをhsv_image_tに格納
+	cv::Mat hsv_ch=hsv_image(range);
+	cv::Mat cv_image2;
+
 
 
 //任意の色のビットを抽出する
     // hsv=｛色相(Hue), 彩度(Saturation), 明暗(Value, brightness)｝ 
     // 指定した範囲の色でマスク画像color_mask(CV_8U:符号なし8ビット整数)を生成  
     // マスク画像は指定した範囲の色に該当する要素は255(8ビットすべて1)、それ以外は0                                                    
-    cv::inRange(hsv_image, cv::Scalar(5, 130, 130, 0) , cv::Scalar(25, 255, 255, 0), color_mask);
-    //hsv_imageに対し、（r,g,b,透明度）(150,100,50,0)から(180,255,255,0)の範囲でマスク画像color_maskを生成(cv::inRangeの作用として、マスク画像は該当する要素は255,それ以外は0?)
+    cv::inRange(hsv_ch, cv::Scalar(5, 130, 130, 0) , cv::Scalar(25, 255, 255, 0), color_mask);
+    //hsv_chに対し、（r,g,b,透明度）(150,100,50,0)から(180,255,255,0)の範囲でマスク画像color_maskを生成(cv::inRangeの作用として、マスク画像は該当する要素は255,それ以外は0?)
 	
 	count = cv::countNonZero(color_mask);
 	
@@ -96,7 +108,7 @@ ImageConverter()
 
 	
     // ビット毎の論理積。マスク画像は指定した範囲以外は0で、指定範囲の要素は255なので、ビット毎の論理積を適用すると、指定した範囲の色に対応する要素はそのままで、他は0になる。
-    cv::bitwise_and(cv_ptr->image, cv_ptr->image, cv_image2, color_mask);
+    cv::bitwise_and(hsv_ch, hsv_ch, cv_image2, color_mask);
     //マスク画像とcv_ptrに対し、ビットごとに論理積を適用。これをcv_image2に格納
 
     
