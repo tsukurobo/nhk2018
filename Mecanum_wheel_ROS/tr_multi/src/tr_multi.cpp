@@ -33,7 +33,7 @@
 
 //w[]はホイールの制御量 maxは|w[]|の最大数 spは平行移動の速度（0~1） tnは回転の速度 m及びtは下の計算式参照。これにより制御の平行移動(m)と回転(t)の比重を変える。
 int w[5],max,sp,tn,m,t;
-float x,y;
+float x,y,tu;
 //std_msgs::Int8 mv; // 0静止　1動作
 std_msgs::Int8MultiArray array;
 
