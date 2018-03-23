@@ -33,6 +33,7 @@
 
 //w[]はホイールの制御量 maxは|w[]|の最大数 spは平行移動の速度（0~1） tnは回転の速度 m及びtは下の計算式参照。これにより制御の平行移動(m)と回転(t)の比重を変える。
 int w[5],max,sp,tn,m,t;
+float x,y;
 //std_msgs::Int8 mv; // 0静止　1動作
 std_msgs::Int8MultiArray array;
 
@@ -43,7 +44,7 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
 
 
 	m=50;
-	t=100;
+	tu=100;
 	sp=0;
 	//このプログラムでは縦方向・横方向・回転方向の制御量の和によって制御量を求めている。
 	//spに平行移動ジョイスティックの値の和*100（max200）を入れる。この必要性は後ほど
@@ -52,11 +53,14 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
 	//tnに回転方向のジョイスティックの値*100を入れる
 	tn=abs(100*joy->axes[2]);
 
+	x=m*joy->axes[0];
+	y=m*joy->axes[1];	
+	t=tu*joy->axes[2];	
 	//縦方向・横方向・回転の制御量を足す。要はベクトルの合成
-	w[1]=-m*joy->axes[0]+m*joy->axes[1]-t*joy->axes[2];
-	w[2]=m*joy->axes[0]+m*joy->axes[1]+t*joy->axes[2];
-	w[3]=m*joy->axes[0]+m*joy->axes[1]-t*joy->axes[2];
-	w[4]=-m*joy->axes[0]+m*joy->axes[1]+t*joy->axes[2];
+	w[1]=-x+y-t;
+	w[2]=x+y+t;
+	w[3]=x+y-t;
+	w[4]=-x+y+t;
 	//mv.data = 1;
 	max=0;
 	for(int i=1;i<5;i++){
