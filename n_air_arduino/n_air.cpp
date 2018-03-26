@@ -10,12 +10,12 @@ ti2c(i2caddr){
 }
 
 void NAir::toggle(int port){
-  //@param pw: -100~100
-  // char buf[10];
-  //sprintf(buf, "%d", power);
+  //@param pw: 1~8
+   char buf[10];
+  sprintf(buf, "%d", port);
   this->ti2c.sendStr(buf); 
 }
 
 void NAir::init(){
-    this -> ti2c.receiveStr(buf);  
+    this -> ti2c.receiveStr("0");  
 }

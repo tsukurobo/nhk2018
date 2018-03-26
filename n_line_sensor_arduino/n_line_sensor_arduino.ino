@@ -3,7 +3,7 @@
 
 #define LINE_SENSOR_ALL_SUM 8 // LINE_SENSOR_AVR_SUM * 2
 const uint8_t addr0 = 0x21;
-const uint8_t addr1 = 0x22;
+const uint8_t addr1 = 0x21;
 NLineSensor lineSensor0 = NLineSensor(addr0, addr1);
 
 int line_sensor_value[LINE_SENSOR_ALL_SUM] = {};

@@ -19,7 +19,7 @@
 
 #define SENSOR_SUM 4
 
-#define I2C_ADDR 0x14
+#define I2C_ADDR 0x21
 int sensor_values[SENSOR_SUM] = {};
 
 void i2c_received_cb(char* str) {
@@ -35,9 +35,9 @@ void i2c_request_cb(char* buf) {
 
 void setup (){
 	
-	//DDRB = 0b11111111;
-	//DDRC = 0b00001111;
-	//DDRD = 0b11111111;
+	DDRB = 0b11111111;
+	DDRC = 0b00001111;
+	DDRD = 0b11111111;
 
 	// LED of addresses 0x10~ 0x1F 0~F -> 0~15
 	//PORTD |= (0b00001111 & I2C_ADDR);
@@ -52,10 +52,10 @@ int main(void)
     while(1)
     {
         //xxx Read Line sensors (ADC) 
-		// sensor_values[0] = xxx;
-		// sensor_values[1] = xxx;
-		// sensor_values[2] = xxx;
-		// sensor_values[3] = xxx;
+		 sensor_values[0] = 9;
+	     sensor_values[1] = 8;
+		 sensor_values[2] = 7;
+		 sensor_values[3] = 6;
 		_delay_ms(10);
     }
 }

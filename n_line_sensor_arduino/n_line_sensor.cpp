@@ -40,7 +40,7 @@ void NLineSensor::lineSensor(int arr[]){
     arr[i] = atoi(str);
   }
 
-  // "value4,value5,value6,value7 -> [value0, value1, value2, value3, value4, value5, value6, value7]"
+ /* // "value4,value5,value6,value7 -> [value0, value1, value2, value3, value4, value5, value6, value7]"
   buf_index = 0;
   this->ti2c1.receiveStr(buf);
   // "value0,value1,value2,value3" -> [value0, value1, value2, value3]
@@ -58,6 +58,6 @@ void NLineSensor::lineSensor(int arr[]){
     }
     // string to int
     arr[i] = atoi(str);
-  }
+  }*/
 
 }

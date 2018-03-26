@@ -5,9 +5,8 @@
 #include "n_air.h"
 
 // main for testing.
-uint8_t addr = 0x11;
+uint8_t addr = 0x14;
 NAir air = NAir(addr);
-
 
 
 void setup(){
@@ -18,8 +17,20 @@ void setup(){
   air.init();
 }
 
+int n;
+
 void loop(){
-  air.toggle(3);
-     
-  delay(1000);
+  
+  if (Serial.available() > 0) { // 受信したデータが存在する
+    n = Serial.read(); // 受信データを読み込む
+
+     n = n - '0';
+
+    Serial.print("I received: "); // 受信データを送りかえす
+    Serial.println(n, DEC);
+
+
+   
+    air.toggle(n);
+  }
 }
