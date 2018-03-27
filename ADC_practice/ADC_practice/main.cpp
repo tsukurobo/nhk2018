@@ -7,36 +7,50 @@
  */ 
 
 #ifndef F_CPU
-#define F_CPU 16000000UL    // 動作周波数に16MHzを指定
+#define F_CPU 1000000UL    // 動作周波数に1MHzを指定
 #endif
 
 #include <avr/io.h>
 #include <util/delay.h>
-#include "lcd.h"
 #include "adc.h"
 
-int main(void){
-	// LCD init
-	 lcd_init();
-	
-	// ADC init
-	ADMUX  = 0b00011010;
+int result = ADC;
+
+void i2c_received_cb(char* str) {
+}
+
+void i2c_request_cb(char* buf) {
+	sprintf(buf, "%d",result);
+}
+
+
+void adc_init(){
+	ADMUX  = 0b00010000;  //pc0を使用するため
 	ADCSRA = 0b11010111;
-	DIDR0  = 0b00100000;
+	DIDR0  = 0b00000001;
+}
+
+void adc(){
+	ADCSRA |= _BV(ADIF);
+	ADCSRA |= _BV(ADSC);
+}
+
+int main(void){
+	setup();
+	adc_init();
+	
 	
 	while(1){
-		// ADCスタート
-		ADCSRA |= _BV(ADIF);
-		ADCSRA |= _BV(ADSC);
+		adc();
+		
 		
 		// ADC完了待ち
 		loop_until_bit_is_set(ADCSRA, ADIF);
 		
 		// ADC結果取得
-		int result = ADC;
 		
-		//lcd_moveCursor(0,0);
-		lcd_printInt(result);
+		
+		
 		
 		_delay_ms(100);
 	}
