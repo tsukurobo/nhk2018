@@ -1,0 +1,16 @@
+#include <ros.h>
+#include <std_msgs/Int8.h>
+#include <std_msgs/Int16.h>
+#include <std_msgs/Int32.h>
+#include <Wire.h>
+#include <stdlib.h>
+#include "ti2c.h"
+
+Ti2c ti2cl = Ti2c(0x11);
+Ti2c ti2cr = Ti2c(0x12);
+int l = 0;
+int r = 0;
+
+void motorLCallBack(const std_msgs::Int8& pw){
+  
+}
