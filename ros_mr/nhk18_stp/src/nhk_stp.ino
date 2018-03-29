@@ -1,12 +1,13 @@
 #include <ros.h>
 #include <std_msgs/Int8.h>
 
-#define WHEEL_DIAMETER 100 //不明
-#define STEP 2.0 //不明
+#define WHEEL_DIAMETER 40//だいたい
+#define STEP 1.8
 #define PW 100
-#define PULSE_FORWARD (WHEEL_DIAMETER * 3.14 * STEP / 360)
+#define PULSE_ROLL (WHEEL_DIAMETER * 3.14 * STEP / 360)//１パルスあたり
 
 void stpaCallback(const std_msgs::Int8& a){
+
 }
 void sptbCallback(const std_msgs::Int8& b){
 }
