@@ -1,6 +1,7 @@
 #include "ros/ros.h"
 #include "sensor_msgs/Joy.h"
-#include "std_msgs/Int8"
+#include "std_msgs/Int8.h"
+#include "std_msgs/Int16.h"
 
 #define STOP 0
 //足回り状態
@@ -26,10 +27,13 @@ int span_ms = 100;//速度？積算のタイムスパン
 int cnt = 0;//タイムスパン用カウンタ
 
 float delta = 0.2;//PID制御用の係数 pgain
-int motorpw_l = 0;
-int motorpw_r = 0;
+int motorpw_l=0;
+int motorpw_r=0;
 
-void set_motor_speed(int motor_pw,int target_pw){//PID制御
+std_msgs::Int16 mpwsender_l,mpwsender_r;//最終的にpubされるmotorpw
+std_msgs::Int16 stpsender_a,stpsender_b;
+
+void set_motor_speed(int& motor_pw,int target_pw){//PID制御でmotorpwに積算する
   int gap = delta * (target_pw - motor_pw);
   if(gap == 0)gap = 1;
   
@@ -37,18 +41,21 @@ void set_motor_speed(int motor_pw,int target_pw){//PID制御
   else if(motor_pw > target_pw)motor_pw -= gap;
 }
 
-void set_stp_move(ros::Publisher& stp){
+void set_stp_move(){//mm単位でどれだけ回すかmsgsに格納
   if(stp_status == STPUP){
-    stp.publlish(500);//mm
+    stpsender_a.data = 500;
+    stpsender_b.data = 500;
   }else if(stp_status == STPDW){
-    stp.publish(-500);//mm
-  }else(stp_status == STOP){
-    stp.publish(0);
+    stpsender_a.data = -500;
+    stpsender_b.data = 500;
+  }else if(stp_status == STOP){
+    stpsender_a.data = 0;
+    stpsender_b.data = 0;
   }
 }
 
 
-void set_motor_status(){
+void set_motor_status(){//statusに応じてmotorpwを変化させる
   if(cnt == span_ms){
     if(status == FORWARD){
       set_motor_speed(motorpw_l,TOPPOWER);
@@ -89,12 +96,6 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
   }else {
     stp_status = STOP;
   }
-
-  if(stp_status != stp_status_buf){
-    stp_status_buf = stp_status;
-    set_stp_move(stpa);
-    set_stp_move(stpb);
-  }
 }
 
 
@@ -104,24 +105,30 @@ int main (int argc, char **argv){
   ros::init(argc,argv,"nhk18_controller");
   ros::NodeHandle nh;
   ros::Subscriber joy = nh.subscribe("joy", 1000, joyCallback);
-  ros::Publisher mr_pub = nh.advertise<std_msgs::Int8>("mr",1000);
-  ros::Publisher ml_pub = nh.advertise<std_msgs::Int8>("ml",1000);
-  ros::Publisher stpa_pub = nh.advertise<std_msgs::Int8>("stpa",1000);
-  ros::Publisher stpb_pub = nh.advertise<std_msgs::Int8>("stpb",1000);
+  ros::Publisher mr_pub = nh.advertise<std_msgs::Int16>("mr",1000);
+  ros::Publisher ml_pub = nh.advertise<std_msgs::Int16>("ml",1000);
+  ros::Publisher stpa_pub = nh.advertise<std_msgs::Int16>("stpa",1000);
+  ros::Publisher stpb_pub = nh.advertise<std_msgs::Int16>("stpb",1000);
   ros::Rate loop_rate(10);
 
   while(ros::ok()){
     set_motor_status();
-    
-    if(l_ispushed == 0 && r_ispushed == 1){
-      mr_pub.publish(motorpw_r + LRGAP);
-      ml_pub.publish(motorpw_l);
+    mpwsender_r.data = motorpw_r;
+    mpwsender_l.data = motorpw_l;
+    if(l_ispushed == 0 && r_ispushed == 1){//L,Rボタンに応じて片方に寄る走行をさせる
+      mpwsender_r.data += LRGAP;
     }else if(l_ispushed == 1 && r_ispushed == 0){
-      mr_pub.publish(motorpw_r);
-      ml_pub.publish(motorpw_l + LRGAP);
-    }else{
-      mr_pub.publish(motorpw_r);
-      ml_pub.publish(motorpw_l);
+      mpwsender_l.data += LRGAP;
+    }
+
+    mr_pub.publish(mpwsender_r);
+    ml_pub.publish(mpwsender_l);
+
+    if(stp_status != stp_status_buf){
+      stp_status_buf = stp_status;
+      set_stp_move();
+      stpa_pub.publish(stpsender_a);
+      stpb_pub.publish(stpsender_b);
     }
 
     ros::spinOnce();

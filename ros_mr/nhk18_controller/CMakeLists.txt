@@ -197,3 +197,8 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+include_directories(include ${catkin_INCLUDE_DIRS})
+
+add_executable(nhk18_controller src/nhk18_controller.cpp)
+target_link_libraries(nhk18_controller ${catkin_LIBRARIES})

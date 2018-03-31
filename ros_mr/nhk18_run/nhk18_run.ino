@@ -15,18 +15,18 @@ IseMotorDriver mr = IseMotorDriver(addrr);
 int l = 0;
 int r = 0;
 
-void motorLCallBack(const std_msgs::Int8& pw){
+void motorLCallBack(const std_msgs::Int16& pw){
   l = pw.data;
   ml.setSpeed(l);
 }
-void motorRCallBack(const std_msgs::Int8& pw){
+void motorRCallBack(const std_msgs::Int16& pw){
   r = pw.data;
   mr.setSpeed(r);
 }
 
 ros::NodeHandle nh;
-ros::Subscriber<std_msgs::Int8>mr("mr",motorRCallBack);
-ros::Subscriber<std_msgs::Int8>ml("ml",motorLCallBack);
+ros::Subscriber<std_msgs::Int16>mr("mr",motorRCallBack);
+ros::Subscriber<std_msgs::Int16>ml("ml",motorLCallBack);
 
 
 void setup(){
