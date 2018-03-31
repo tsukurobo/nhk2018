@@ -3,10 +3,14 @@
 #include "std_msgs/Int8"
 
 #define STOP 0
+//足回り状態
 #define FORWARD 1
 #define BACK 2
 #define TURNL 3
 #define TURNR 4
+//ステピ状態
+#define STPUP 1
+#define STPDW 2
 
 #define THRESHOLD 1000
 #define TOPPOWER 100
@@ -14,6 +18,8 @@
 
 int status = STOP;//状態
 int status_buf = STOP;//直前の状態
+int stp_status = STOP;//ステピの状態
+int stp_status_buf = STOP;//直前のステピの状態
 int r_ispushed,l_ispushed;
 int sw = 0;
 int span_ms = 100;//速度？積算のタイムスパン
@@ -29,6 +35,16 @@ void set_motor_speed(int motor_pw,int target_pw){//PID制御
   
   if(motor_pw < target_pw)motor_pw += gap;
   else if(motor_pw > target_pw)motor_pw -= gap;
+}
+
+void set_stp_move(ros::Publisher& stp){
+  if(stp_status == STPUP){
+    stp.publlish(500);//mm
+  }else if(stp_status == STPDW){
+    stp.publish(-500);//mm
+  }else(stp_status == STOP){
+    stp.publish(0);
+  }
 }
 
 
@@ -67,12 +83,17 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
   }
 
   if(joy -> axes[5] >= THRESHOLD){//十字キー上下でステピ動かす予定
-    up_ispushed = 1;
+    stp_status = STPUP;
   }else if(joy -> axes[3] <= -THRESHOLD){
-    down_ispushed = 1;
+    stp_status = STPDW;
   }else {
-    up_ispushed = 0;
-    down_ispushed = 0;
+    stp_status = STOP;
+  }
+
+  if(stp_status != stp_status_buf){
+    stp_status_buf = stp_status;
+    set_stp_move(stpa);
+    set_stp_move(stpb);
   }
 }
 
