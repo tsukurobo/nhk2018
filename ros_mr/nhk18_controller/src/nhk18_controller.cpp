@@ -14,7 +14,7 @@
 #define STPDW 2
 
 #define THRESHOLD 1000
-#define TOPPOWER 100
+#define TOPPOWER 95
 #define LRGAP 5 //壁伝い走行用の回転差
 
 int status = STOP;//状態
@@ -47,7 +47,7 @@ void set_stp_move(){//mm単位でどれだけ回すかmsgsに格納
     stpsender_b.data = 500;
   }else if(stp_status == STPDW){
     stpsender_a.data = -500;
-    stpsender_b.data = 500;
+    stpsender_b.data = -500;
   }else if(stp_status == STOP){
     stpsender_a.data = 0;
     stpsender_b.data = 0;
