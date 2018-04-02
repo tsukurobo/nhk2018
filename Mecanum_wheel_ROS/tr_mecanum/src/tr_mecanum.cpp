@@ -70,8 +70,8 @@
 //-1-1
 //-1-1
 
-//w[]はホイールの制御量 maxは|w[]|の最大数 spは平行移動の速度（0~1） tnは回転の速度 m及びtは下の計算式参照。これにより制御の平行移動(m)と回転(t)の比重を変える。
-int w[5],max,sp,tn;
+//w[]はホイールの制御量 maxは|w[]|の最大数 spは平行移動の速度（0~1） tnは回転の速度 c平行強度 t回転強度 c*2+t<100になるようにする。 m及びtは下の計算式参照。これにより制御の平行移動(m)と回転(t)の比重を変える。
+int w[5],max,sp,tn,c,t;
 float d=0,length,x,y,m;
 //std_msgs::Int8 mv; // 0静止　1動作
 std_msgs::Int8MultiArray array;
@@ -98,7 +98,7 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
 	else{
 	}
 	
-	d=atan2(joy->axes[1],joy->axes[0])-joy->axes[3]*0.5*m;//<<<<<<<<<<<<<<<<<<ここの*0.5の値を変えて回転による平行移動の補正の強さを調整
+	d=(atan2(joy->axes[1],joy->axes[0])-joy->axes[3]*0.5)*m;//<<<<<<<<<<<<<<<<<<ここの*0.5の値を変えて回転による平行移動の補正の強さを調整
 						      //^^^　この値を調整
 	
 	
@@ -108,17 +108,22 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
 	
 	//平行方向のジョイスティックの変位量を求める
 	length=sqrt(pow(joy->axes[0],2)+pow(joy->axes[1],2))*m;
+	
+	c=37.5;
+	t=25;
+	
+	
 	//回転方向のジョイスティックの変位量
-	tn=joy->axes[3]*25*m;	
+	tn=joy->axes[3]*t*m;	
 	
 	
 	
 	
 	
 	//縦方向の操作量
-	x=cos(d)*length*37.5;
+	x=cos(d)*length*c;
 	//横方向の操作量
-	y=sin(d)*length*37.5;	
+	y=sin(d)*length*c;	
 	
 	w[1]=-x+y-tn;
 	w[2]=x+y+tn;
@@ -147,10 +152,9 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
     array.data.clear();
-    array.data.push_back(w[1]);
-    array.data.push_back(w[2]);
-    array.data.push_back(w[3]);
-    array.data.push_back(w[4]);
+    for(i=0;i<4;i++){
+    	array.data.push_back(w[i+1]);
+    }
     pub.publish(array);
     ros::spinOnce();
     loop_rate.sleep();
