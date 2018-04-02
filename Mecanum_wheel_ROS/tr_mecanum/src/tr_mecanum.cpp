@@ -69,8 +69,8 @@
 //-1-1
 //-1-1
 
-//w[]はホイールの制御量 maxは|w[]|の最大数 spは平行移動の速度（0~1） tnは回転の速度 c平行強度 t回転強度 btn1&btn2ボタンの値 c*2+t<100になるようにする。 m及びtは下の計算式参照。これにより制御の平行移動(m)と回転(t)の比重を変える。
-int w[5],max,sp,tn,c=37.5,t=25,btn1,btn2;
+//w[]はホイールの制御量 maxは|w[]|の最大数 spは平行移動の速度（0~1） tnは回転の速度 c平行強度 t回転強度 btn1&btn2ボタンの値  m及びtは下の計算式参照。これにより制御の平行移動(m)と回転(t)の比重を変える。
+int w[5],max,sp,tn,c=48,t=25,btn1,btn2;
 //d角度 dt角度に加算する角度 lengthジョイスティックの傾き x横方向の操作量 y縦方向の操作量 m係数 side左右のジョイスティックの値 foward前後のジョイスティックの値 turn回転のジョイスティックの値 
 float d=0,dt=0,length,x,y,m,side,foward,turn;
 //std_msgs::Int8 mv; // 0静止　1動作
@@ -120,12 +120,20 @@ void cal(){
 	//縦方向の操作量
 	x=cos(d)*length*c;
 	//横方向の操作量
-	y=sin(d)*length*c;	
+	y=sin(d)*length*c;
 	
 	w[1]=-x+y-tn;
 	w[2]=x+y+tn;
 	w[3]=x+y-tn;
-	w[4]=-x+y+tn;	
+	w[4]=-x+y+tn;
+	
+	for(int i=1;i<5;i++){
+		if(w[i]>100){
+			w[i]=100;
+		}
+		else{
+		}
+	}	
 }
 
 //joyの値を変数に入れる
