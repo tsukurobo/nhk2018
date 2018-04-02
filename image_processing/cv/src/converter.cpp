@@ -8,6 +8,10 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "opencv/highgui.h"
 #include "std_msgs/Int32.h"
+#include "std_msgs/MultiArrayLayout.h"
+#include "std_msgs/MultiArrayDimension.h"
+#include "std_msgs/Int32MultiArray.h"
+#include <stdlib.h>
 static const std::string OPENCV_WINDOW = "Image window";
 static int count;
 float  x;
@@ -17,10 +21,11 @@ class ImageConverter
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
-  image_transport::Publisher image_pub_;
   ros::Publisher centerx_pub = nh_.advertise<std_msgs::Int32>("centerx", 1000);
   ros::Publisher centery_pub = nh_.advertise<std_msgs::Int32>("centery", 1000);
   ros::Publisher counter_pub = nh_.advertise<std_msgs::Int32>("counter", 1000);
+  
+
 public:
   // コンストラクタ
   //（動作時のパブサブ設定？）
@@ -30,8 +35,6 @@ ImageConverter()
     // カラー画像をサブスクライブ                                                                
     image_sub_ = it_.subscribe("/usb_cam/image_raw", 1,
       &ImageConverter::imageCb, this);
-    // 処理した画像をパブリシュ                                                                                          
-    image_pub_ = it_.advertise("/image_topic", 1);
  }
  
 
@@ -43,27 +46,17 @@ ImageConverter()
   }
 
 
-
-
   // コールバック関数
   void imageCb(const sensor_msgs::ImageConstPtr& msg)
   {
 
 
-
-
-
-  
-
-
-
-    cv_bridge::CvImagePtr cv_ptr, cv_ptr2, cv_ptr3;
-    //cv_ptrはオリジナルに円を描写、cv_ptr3はエッジ検出したものになる
+    cv_bridge::CvImagePtr cv_ptr, cv_ptr2;
+    //cv_ptrはオリジナル
  try
     {
       // ROSからOpenCVの形式にtoCvCopy()で変換。cv_ptr->imageがcv::Matフォーマット。
       cv_ptr    = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-      cv_ptr3   = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
     }
     catch (cv_bridge::Exception& e)
     {
@@ -72,7 +65,7 @@ ImageConverter()
     }
 
     //（使うものの宣言？）
-    cv::Mat hsv_image, color_mask, gray_image, cv_image3;
+    cv::Mat hsv_image, color_mask, gray_image;
 
     // cv_ptrをRGB表色系からHSV表色系へ変換して、hsv_imageに格納
     cv::cvtColor(cv_ptr->image, hsv_image, CV_BGR2HSV);
@@ -99,8 +92,6 @@ ImageConverter()
 	
 	count = cv::countNonZero(color_mask);
 	
-	//ROS_INFO("vallue=%d", count); 
-	
 	cv::Mat img = color_mask.clone();
 	cv::Moments mu = moments(img,false);
 	x= mu.m10/mu.m00;
@@ -111,45 +102,20 @@ ImageConverter()
     cv::bitwise_and(hsv_ch, hsv_ch, cv_image2, color_mask);
     //マスク画像とcv_ptrに対し、ビットごとに論理積を適用。これをcv_image2に格納
 
-    
-
-//cv_ptrをグレースケールに変換し、エッジ検出。結果をcv_ptr3のimageに格納
-
-    // グレースケールに変換
-    cv::cvtColor(cv_ptr->image, gray_image, CV_BGR2GRAY);
-    //cv_ptrをグレースケールに変換し、gray_imageに格納
-
-    // エッジを検出するためにCannyアルゴリズムを適用し、cv_ptr3のimageに格納
-    cv::Canny(gray_image, cv_ptr3->image, 15.0, 30.0, 3);
-    //前項で作成したグレースケールにCannyアルゴリズムを適用し、cv_ptr3のimageに格納
-
-
-//cv_ptrのimageに円を描写
-
-    // cv_ptrのimageに円を描写                                               
-    cv::circle(cv_ptr->image, cv::Point(100, 100), 20, CV_RGB(0,255,0));
-
-
 
 //各画像のサイズを変更
 
     // 画像サイズ指定
-    cv::Mat cv_half_image, cv_half_image2, cv_half_image3;
+    cv::Mat cv_half_image, cv_half_image2;
     cv::resize(cv_ptr->image, cv_half_image,cv::Size(),1.5,1.5);
     cv::resize(cv_image2, cv_half_image2,cv::Size(),1.5,1.5);
-    cv::resize(cv_ptr3->image, cv_half_image3,cv::Size(),1.5,1.5);
 
 //ウィンドウ表示
 
     // ウインドウ表示                                                                         
     cv::imshow("Original Image", cv_half_image);
     cv::imshow("Result Image", cv_half_image2);
-    cv::imshow("Edge Image", cv_half_image3);
     cv::waitKey(3);
- 
-
-
-
 
 
 	std_msgs::Int32 value;
@@ -170,11 +136,7 @@ ImageConverter()
 
 
 
-
-    // エッジ画像をパブリッシュ。OpenCVからROS形式にtoImageMsg()で変換。                                                            
-    image_pub_.publish(cv_ptr3->toImageMsg());
   }
-
 };
 
  
