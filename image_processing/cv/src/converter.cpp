@@ -21,9 +21,7 @@ class ImageConverter
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
-  ros::Publisher centerx_pub = nh_.advertise<std_msgs::Int32>("centerx", 1000);
-  ros::Publisher centery_pub = nh_.advertise<std_msgs::Int32>("centery", 1000);
-  ros::Publisher counter_pub = nh_.advertise<std_msgs::Int32>("counter", 1000);
+  ros::Publisher pub = nh_.advertise<std_msgs::Int32MultiArray>("image_param", 100);
   
 
 public:
@@ -118,23 +116,13 @@ ImageConverter()
     cv::waitKey(3);
 
 
-	std_msgs::Int32 value;
-	ROS_INFO("value=%d", count); 
-	value.data = count;
-	counter_pub.publish(value);
-
-	std_msgs::Int32 centerx;
-	centerx.data = x;
-
-	std_msgs::Int32 centery;
-	centery.data = y;
-
-	centerx_pub.publish(centerx);
-	centery_pub.publish(centery);
-	
-	ROS_INFO("x=%f,y=%f",x,y);
-
-
+	std_msgs::Int32MultiArray image_param;
+	image_param.data.clear();
+	image_param.data.push_back(x);
+	image_param.data.push_back(y);
+	image_param.data.push_back(count);
+	pub.publish(image_param);
+	ROS_INFO("x=%f,y=%f,value=%d",x,y,count);
 
   }
 };
