@@ -172,8 +172,8 @@ ImageConverter()
     // hsv=｛色相(Hue), 彩度(Saturation), 明暗(Value, brightness)｝ 
     // 指定した範囲の色でマスク画像color_mask(CV_8U:符号なし8ビット整数)を生成  
     // マスク画像は指定した範囲の色に該当する要素は255(8ビットすべて1)、それ以外は0                                                    
-    cv::inRange(hsv_ch, cv::Scalar(15, 20, 50, 0) , cv::Scalar(50, 255, 255, 0), color_mask1);
-    cv::inRange(hsv_ch, cv::Scalar(65,10, 50, 100) , cv::Scalar(95, 255, 255, 0), color_mask2);
+    cv::inRange(hsv_ch, cv::Scalar(15, 5, 30, 0) , cv::Scalar(50, 255, 255, 0), color_mask1);
+    cv::inRange(hsv_ch, cv::Scalar(65,10, 30, 100) , cv::Scalar(95, 255, 255, 0), color_mask2);
     cv::inRange(hsv_ch, cv::Scalar(110, 10, 50, 0) , cv::Scalar(150, 255, 255, 0), color_mask3);
     //hsv_chに対し、（ｈ色相,ｓ彩度,ｖ明度）(150,100,50,0)から(180,255,255,0)の範囲でマスク画像color_mask1を生成(cv::inRangeの作用として、マスク画像は該当する要素は255,それ以外は0?)
 	
@@ -207,8 +207,8 @@ ImageConverter()
 
     // 画像サイズ指定
     cv::Mat cv_half_image, hsv_half_image, cv_half_image1, cv_half_image2, cv_half_image3;
-    cv::resize(cv_ptr->image, cv_half_image,cv::Size(),1.5,1.5);
-    cv::resize(hsv_ch, hsv_half_image,cv::Size(),1.5,1.5);  
+    cv::resize(cv_ptr->image, cv_half_image,cv::Size(),1.0,1.0);
+    cv::resize(hsv_ch, hsv_half_image,cv::Size(),1.0,1.0);  
     cv::resize(cv_image1, cv_half_image1,cv::Size(),1.0,1.0);
     cv::resize(cv_image2, cv_half_image2,cv::Size(),1.0,1.0);
     cv::resize(cv_image3, cv_half_image3,cv::Size(),1.0,1.0);
