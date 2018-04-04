@@ -2,6 +2,7 @@
 
 #include <std_msgs/Int8.h>
 
+#include <std_msgs/Int16.h>
 
 
 #define WHEEL_DIAMETER 40//だいたい
@@ -18,9 +19,9 @@
 
 #define DEFAULTPW 80
 
-#define PULSEPIN　//モーター
+#define PULSEPIN 1
 
-#define DIRPIN
+#define DIRPIN 2
 
 void pulse(){
   
@@ -32,14 +33,14 @@ void pulse(){
   
   output = !output;
   
-  while(){
+  while(1){
     int forwtime = micros;
     if(forwtime-pretime==750)break;
-  }　　　　　　　　　　　　　　　　　　　//750秒待つ
+  }
 
   digitalWrite(PULSEPIN,output);
 
-  while(){
+  while(1){
     int forwtime = micros;
     if(forwtime-pretime==1500)break;
   }
@@ -54,27 +55,27 @@ void pulse(){
 
 
 void stpaCallback(const std_msgs::Int16& a){
-
+     int i,j = 0;
      int input_pulse = a.data/PULSE_ROLL;
 
-     if(input_plus>=0){
+     if(input_pulse>=0){
       
       digitalWrite(DIRPIN,HIGH);
       
-      for(int i=0,i<=input_plus,i++){
-        plus();
+      for( i=0;i<=input_pulse;i++){
+        pulse();
   
         }
       
       
       }
 
-     if(input_plus<0){
-      input_plus = -input_plus;
+     if(input_pulse<0){
+      input_pulse = -input_pulse;
       digitalWrite(DIRPIN,LOW);
       
-      for(int i=0,i<=input_plus,i++){
-        plus();
+      for( j=0;j<=input_pulse;j++){
+        pulse();
   
         }
       
@@ -100,10 +101,7 @@ void setup(){
   digitalWrite(DIRPIN,HIGH);
   digitalWrite(PULSEPIN,LOW);
   
-
   nh.initNode();
-
-  stp_motor_init();
 
   nh.subscribe(stpa);
 
