@@ -75,7 +75,7 @@ int w[6],max,sp,tn,c=48,t=25,btn0,btn1,btn2;
 float d=0,dt=0,length,x,y,m,side,foward,turn,half=0.5,min=0.3;
 //std_msgs::Int8 mv; // 0静止　1動作
 std_msgs::Int8MultiArray array;
-void cal(){
+void cal(float side,float foward,float turn){
 //joy_nodeはジョイスティックの値およびボタンのon/offを配列でパブしている。rosrun joy joy_node　してrostopic echo joy　すれば分かる。
 //joy->axes[0]が平行移動のジョイスティックの縦方向の値　joy->axes[1]平行移動のジョイスティックの横方向の値 joy->axes[2]が回転のジョイスティックの横方向の値
 
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
     //操作量を計算する
-    cal();
+    cal(side,foward,turn);
     ROS_INFO("d=%f",d);
     if(w[5]<=5){
     	w[5]=w[5]+1;
