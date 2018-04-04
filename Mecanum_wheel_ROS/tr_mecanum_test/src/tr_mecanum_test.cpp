@@ -13,39 +13,12 @@
 
 
 
-
-
-
 //このプログラムではxboxのコントローラをつかいました。よってjoyの配列の値が少々異なります。
 //ジョイスティックの可動範囲が円になっているため、spの値を中心からの移動量にしました。
 
 
 
-
-
-
-
-
-
-
-
-
 //回転による平行移動の補正のパラメータ調整が済んでいません。暇な人は調整お願いします。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -70,7 +43,7 @@
 //-1-1
 
 //w[]はホイールの制御量 maxは|w[]|の最大数 spは平行移動の速度（0~1） tnは回転の速度 c平行強度 t回転強度 btn1&btn2ボタンの値  m及びtは下の計算式参照。これにより制御の平行移動(m)と回転(t)の比重を変える。
-int w[6],max,sp,tn,c=48,t=25,btn0,btn1,btn2;
+int w[5],max,sp,tn,c=48,t=25,btn0,btn1,btn2;
 //d角度 dt角度に加算する角度 lengthジョイスティックの傾き x横方向の操作量 y縦方向の操作量 m係数 side左右のジョイスティックの値 foward前後のジョイスティックの値 turn回転のジョイスティックの値 
 float d=0,dt=0,length,x,y,m,side,foward,turn,half=0.5,min=0.3;
 //std_msgs::Int8 mv; // 0静止　1動作
@@ -166,15 +139,9 @@ int main(int argc, char **argv)
     //操作量を計算する
     cal(side,foward,turn);
     ROS_INFO("d=%f",d);
-    if(w[5]<=5){
-    	w[5]=w[5]+1;
-    }
-    else if(w[5]>5){
-    	w[5]=0;
-    }
     
     array.data.clear();
-    for(int i=0;i<5;i++){
+    for(int i=0;i<4;i++){
     	array.data.push_back(w[i+1]);
     }
     pub.publish(array);
