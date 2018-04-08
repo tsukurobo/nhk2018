@@ -14,8 +14,9 @@
 #define STPDW 2
 
 #define THRESHOLD 0.5
-#define TOPPOWER 95
+#define TOPPOWER 90
 #define LRGAP 5 //壁伝い走行用の回転差
+#define STPX 100//ラックを持ち上げる際の変位（mm）
 
 int status = STOP;//状態
 int status_buf = STOP;//直前の状態
@@ -47,19 +48,17 @@ void set_motor_speed(int& motor_pw,int target_pw){//PID制御でmotorpwに積算
 
 void set_stp_move(){//mm単位でどれだけ回すかmsgsに格納
   if(stp_status == STPUP){
-    stpsender_a.data = 500;
-    stpsender_b.data = 500;
+    stpsender_a.data = STPX;
+    stpsender_b.data = STPX;
     ROS_INFO("stp cw \n");
   }else if(stp_status == STPDW){
-    stpsender_a.data = -500;
-    stpsender_b.data = -500;
+    stpsender_a.data = -STPX;
+    stpsender_b.data = -STPX;
     ROS_INFO("stp ccw \n");
-  }else if(stp_status == STOP){
-    stpsender_a.data = 0;
-    stpsender_b.data = 0;
-    ROS_INFO("stp stop");
-    
-  }
+  }//else if(stp_status == STOP){
+  //stpsender_a.data = 0;
+  //stpsender_b.data = 0;
+  //ROS_INFO("stp stop");
 }
 
 
@@ -103,11 +102,13 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
 
   if(joy -> axes[5] >= THRESHOLD){//十字キー上下でステピ動かす予定
     stp_status = STPUP;
+    set_stp_move();
   }else if(joy -> axes[5] <= -THRESHOLD){
     stp_status = STPDW;
-  }else {
-    stp_status = STOP;
-  }
+    set_stp_move();
+  }//else {
+  //stp_status = STOP;
+  //}
 }
 
 

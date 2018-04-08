@@ -7,21 +7,21 @@
 #include "ti2c.h"
 #include "ise_motor_driver.h"
 
-unit8_t addrl = 0x11;
-unit8_t addrr = 0x12;
+uint8_t addrl = 0x27;
+uint8_t addrr = 0x26;
 
-IseMotorDriver ml = IseMotorDriver(addrl);
-IseMotorDriver mr = IseMotorDriver(addrr);
+IseMotorDriver mdl = IseMotorDriver(addrl);
+IseMotorDriver mdr = IseMotorDriver(addrr);
 int l = 0;
 int r = 0;
 
 void motorLCallBack(const std_msgs::Int16& pw){
   l = pw.data;
-  ml.setSpeed(l);
+  mdl.setSpeed(l);
 }
 void motorRCallBack(const std_msgs::Int16& pw){
   r = pw.data;
-  mr.setSpeed(r);
+  mdr.setSpeed(r);
 }
 
 ros::NodeHandle nh;
