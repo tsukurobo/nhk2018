@@ -27,7 +27,7 @@ int sw = 0;
 int span_ms = 2;//速度？積算のタイムスパン
 int cnt = 0;//タイムスパン用カウンタ
 
-float delta = 0.2;//PID制御用の係数 pgain
+float delta = 0.4;//PID制御用の係数 pgain
 int motorpw_l=0;
 int motorpw_r=0;
 
