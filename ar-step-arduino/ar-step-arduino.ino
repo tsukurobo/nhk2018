@@ -5,7 +5,7 @@
 #include <std_msgs/Int16.h>
 
 
-#define WHEEL_DIAMETER 40//だいたい
+#define WHEEL_DIAMETER 25//だいたい
 
 #define STEP 1.8
 
@@ -19,33 +19,32 @@
 
 #define DEFAULTPW 80
 
-#define PULSEPIN 1
+#define PULSEPIN 2
 
-#define DIRPIN 2
+#define DIRPIN 3
+
+volatile int input_pulse = 0;
+
+ros::NodeHandle nh;
+
+void stpaCallback(const std_msgs::Int16& a){
+     
+     input_pulse = a.data/PULSE_ROLL;
+     
+     
+}
+
+ros::Subscriber<std_msgs::Int16> stpa("stpa",stpaCallback);
 
 void pulse(){
   
   static  boolean output = HIGH;
-  
-  int pretime = micros;//時間の原点をとる
+ 
   
   digitalWrite(PULSEPIN,output);//パルスをHIGH
   
   output = !output;
   
-  while(1){
-    int forwtime = micros;
-    if(forwtime-pretime==750)break;
-  }
-
-  digitalWrite(PULSEPIN,output);
-
-  while(1){
-    int forwtime = micros;
-    if(forwtime-pretime==1500)break;
-  }
-
-  output = !output;
      
     
     
@@ -54,32 +53,66 @@ void pulse(){
 
 
 
-void stpaCallback(const std_msgs::Int16& a){
-     int i,j = 0;
-     int input_pulse = a.data/PULSE_ROLL;
 
-     if(input_pulse>=0){
+
+
+
+void test(int b){
+     int i,j = 0;
+     static int count = 0;
+
+     if(b>=0){
+      Serial.print("+");
       
       digitalWrite(DIRPIN,HIGH);
       
-      for( i=0;i<=input_pulse;i++){
-        pulse();
+      
+      pulse();
+
+      count++;
   
-        }
+     
       
       
       }
 
-     if(input_pulse<0){
-      input_pulse = -input_pulse;
+     if(b<0){
+      Serial.print("-");
+      b= -b;
       digitalWrite(DIRPIN,LOW);
       
-      for( j=0;j<=input_pulse;j++){
-        pulse();
+      
+      pulse();
   
+      count++;
+      
+      
+      }
+
+     if(count>b*2){
+      
+      count = 0;
+
+      while(1){
+        nh.spinOnce();
+
+        static int num2 = 0;
+        int num1 = input_pulse;
+
+        if(num1 != num2 ){
+          num2 = num1;
+
+          break;
+          
+          }
+        
+        num2 = num1;
+        
+        
         }
       
       
+     
       }
 
 
@@ -88,9 +121,8 @@ void stpaCallback(const std_msgs::Int16& a){
 
 
 
-ros::NodeHandle nh;
 
-ros::Subscriber<std_msgs::Int16> stpa("stpa",stpaCallback);
+
 
 
 
@@ -100,6 +132,9 @@ void setup(){
   pinMode(PULSEPIN,OUTPUT);
   digitalWrite(DIRPIN,HIGH);
   digitalWrite(PULSEPIN,LOW);
+  Serial.begin(9600);
+
+  
   
   nh.initNode();
 
@@ -111,8 +146,12 @@ void setup(){
 
 
 void loop(){
+  Serial.print(1);
 
-  delay(10);
+  test(input_pulse);
+
+
+  delayMicroseconds(1500);
 
   nh.spinOnce();
 
