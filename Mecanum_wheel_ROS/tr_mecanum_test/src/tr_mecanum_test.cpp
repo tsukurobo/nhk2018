@@ -70,11 +70,22 @@ void cal(float side,float foward,float turn){
 	}
 	
 	//xboxのコントローラは原点に戻らないため、ブレを消去
-	if(btn0==1){
-		dt=0;
+	if(fabs(turn)>=0.1){
+		dt=dt+turn*0.1;
 	}
 	else{
 	}
+	if(fabs(foward)<=0.05){
+		foward=0;
+	}
+	else{
+	}
+	if(fabs(side)<=0.05){
+		side=0;
+	}
+	else{
+	}
+	
 	
 	d=(atan2(foward,-(side)));//角度を割り出す。
 	
