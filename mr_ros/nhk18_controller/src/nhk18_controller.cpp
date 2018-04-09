@@ -16,7 +16,8 @@
 #define THRESHOLD 0.5
 #define TOPPOWER 90
 #define LRGAP 5 //壁伝い走行用の回転差
-#define STPX 100//ラックを持ち上げる際の変位（mm）
+#define STPX 150//ラックを持ち上げる際の変位（mm）
+#define SUPRESS 0.1
 
 int status = STOP;//状態
 int status_buf = STOP;//直前の状態
@@ -27,7 +28,8 @@ int sw = 0;
 int span_ms = 2;//速度？積算のタイムスパン
 int cnt = 0;//タイムスパン用カウンタ
 
-float delta = 0.4;//PID制御用の係数 pgain
+float delta = 0.8;//PID制御用の係数 pgain
+
 int motorpw_l=0;
 int motorpw_r=0;
 
@@ -102,10 +104,8 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
 
   if(joy -> axes[5] >= THRESHOLD){//十字キー上下でステピ動かす予定
     stp_status = STPUP;
-    set_stp_move();
   }else if(joy -> axes[5] <= -THRESHOLD){
     stp_status = STPDW;
-    set_stp_move();
   }//else {
   //stp_status = STOP;
   //}
@@ -129,9 +129,13 @@ int main (int argc, char **argv){
     mpwsender_r.data = motorpw_r;
     mpwsender_l.data = motorpw_l;
     if(l_ispushed == 0 && r_ispushed == 1){//L,Rボタンに応じて片方に寄る走行をさせる
-      mpwsender_r.data += LRGAP;
+      if(mpwsender_l.data >= 0)
+	mpwsender_l.data += (mpwsender_l.data * SUPRESS);
+      else mpwsender_l.data -= (mpwsender_l.data * SUPRESS);
     }else if(l_ispushed == 1 && r_ispushed == 0){
-      mpwsender_l.data += LRGAP;
+      if(mpwsender_r.data >= 0)
+	mpwsender_r.data += (mpwsender_r.data * SUPRESS);
+      else mpwsender_r.data -= (mpwsender_r.data * SUPRESS);
     }
 
     mr_pub.publish(mpwsender_l);
@@ -139,6 +143,7 @@ int main (int argc, char **argv){
 
     ROS_INFO("L:%d",mpwsender_l.data);
     ROS_INFO("R:%d\n",mpwsender_r.data);
+
 
     if(stp_status != stp_status_buf){
       stp_status_buf = stp_status;

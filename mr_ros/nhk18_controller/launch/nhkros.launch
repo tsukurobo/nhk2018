@@ -1,10 +1,9 @@
 <launch>
-  <group ns = "nhk18_controller">
     <node pkg = "nhk18_controller" name = "controller" type = "nhk18_controller"/>
-    <node pkg ="rosserial_python" type = "serial_node.py" name = "nhk18_mr_stp"/>
-    <node pkg = "rosserial_python" type = "serial_node.py" name = "nhk18_mr_run"/>
-  </gruop>
-  <group ns = "joy">
-    <node pkg = "joy" name = "joy" type = "joy_node"/>
-  </group>
+    <node pkg = "rosserial_python" type = "serial_node.py" name = "nhk18_mr_stp">
+      <param name = "port" type = "string" value = "/dev/ttyUSB0"/>
+    </node>
+    <node pkg = "rosserial_python" type = "serial_node.py" name = "nhk18_mr_run">
+      <param name = "port" type = "string" value = "/dev/ttyACM0"/>
+    </node>
 </launch>

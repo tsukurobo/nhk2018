@@ -13,7 +13,7 @@
 #define STPUP 1
 #define STPDW 2
 
-#define THRESHOLD 1000
+#define THRESHOLD 0.5
 #define TOPPOWER 95
 #define LRGAP 5 //壁伝い走行用の回転差
 
@@ -23,7 +23,7 @@ int stp_status = STOP;//ステピの状態
 int stp_status_buf = STOP;//直前のステピの状態
 int r_ispushed,l_ispushed;
 int sw = 0;
-int span_ms = 100;//速度？積算のタイムスパン
+int span_ms = 2;//速度？積算のタイムスパン
 int cnt = 0;//タイムスパン用カウンタ
 
 float delta = 0.2;//PID制御用の係数 pgain
@@ -34,23 +34,31 @@ std_msgs::Int16 mpwsender_l,mpwsender_r;//最終的にpubされるmotorpw
 std_msgs::Int16 stpsender_a,stpsender_b;
 
 void set_motor_speed(int& motor_pw,int target_pw){//PID制御でmotorpwに積算する
-  int gap = delta * (target_pw - motor_pw);
-  if(gap == 0)gap = 1;
   
-  if(motor_pw < target_pw)motor_pw += gap;
-  else if(motor_pw > target_pw)motor_pw -= gap;
+  int gap = delta * (target_pw - motor_pw);
+  if(gap == 0){
+    if(target_pw-motor_pw > 0)gap = 1;
+    else if (target_pw-motor_pw < 0)gap = -1;
+    else gap = 0;
+  }
+  
+  motor_pw += gap;
 }
 
 void set_stp_move(){//mm単位でどれだけ回すかmsgsに格納
   if(stp_status == STPUP){
     stpsender_a.data = 500;
     stpsender_b.data = 500;
+    ROS_INFO("stp cw \n");
   }else if(stp_status == STPDW){
     stpsender_a.data = -500;
     stpsender_b.data = -500;
+    ROS_INFO("stp ccw \n");
   }else if(stp_status == STOP){
     stpsender_a.data = 0;
     stpsender_b.data = 0;
+    ROS_INFO("stp stop");
+    
   }
 }
 
@@ -73,9 +81,13 @@ void set_motor_status(){//statusに応じてmotorpwを変化させる
 }
 
 void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
-  if(joy->axes[1] >= THRESHOLD)status = FORWARD;
-  else if(joy->axes[1] <= -THRESHOLD)status = BACK;
-  else status = STOP;
+  if(joy->axes[1] >= THRESHOLD){
+    status = FORWARD;
+  }else if(joy->axes[1] <= -THRESHOLD){
+    status = BACK;
+  }else{
+    status = STOP;
+  }
 
   if(joy->buttons[5]){//Rボタン（右寄り走行）
     r_ispushed = 1;
@@ -91,7 +103,7 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
 
   if(joy -> axes[5] >= THRESHOLD){//十字キー上下でステピ動かす予定
     stp_status = STPUP;
-  }else if(joy -> axes[3] <= -THRESHOLD){
+  }else if(joy -> axes[5] <= -THRESHOLD){
     stp_status = STPDW;
   }else {
     stp_status = STOP;
@@ -121,8 +133,11 @@ int main (int argc, char **argv){
       mpwsender_l.data += LRGAP;
     }
 
-    mr_pub.publish(mpwsender_r);
-    ml_pub.publish(mpwsender_l);
+    mr_pub.publish(mpwsender_l);
+    ml_pub.publish(mpwsender_r);
+
+    ROS_INFO("L:%d",mpwsender_l.data);
+    ROS_INFO("R:%d\n",mpwsender_r.data);
 
     if(stp_status != stp_status_buf){
       stp_status_buf = stp_status;
