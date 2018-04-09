@@ -99,7 +99,7 @@ void cal(float side,float foward,float turn){
 //joyの値を変数に入れる
 void camCallback(const std_msgs::Int32MultiArray::ConstPtr& image_param){
 	static float e1,e2,e3,e4;
-	const float p_gain=0.1,i_gain=0.0000,d_gain=0.0000;
+	const float p_gain=0.3,i_gain=0.0000,d_gain=0.0000;
 	float cam_param;
 	int cam[12];
     int param = 0;
