@@ -7,8 +7,8 @@
 #include "ti2c.h"
 #include "ise_motor_driver.h"
 
-uint8_t addrl = 0x27;
-uint8_t addrr = 0x26;
+uint8_t addrr = 0x27;
+uint8_t addrl = 0x26;
 
 IseMotorDriver mdl = IseMotorDriver(addrl);
 IseMotorDriver mdr = IseMotorDriver(addrr);
