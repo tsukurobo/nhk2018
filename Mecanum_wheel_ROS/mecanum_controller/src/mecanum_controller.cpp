@@ -45,9 +45,12 @@
 //w[]はホイールの制御量 maxは|w[]|の最大数 spは平行移動の速度（0~1） tnは回転の速度 c平行強度 t回転強度 btn1&btn2ボタンの値  m及びtは下の計算式参照。これにより制御の平行移動(m)と回転(t)の比重を変える。
 int w[5],max,sp,tn,c=48,t=25,btn0,btn1,btn2;
 //d角度 dt角度に加算する角度 lengthジョイスティックの傾き x横方向の操作量 y縦方向の操作量 m係数 side左右のジョイスティックの値 foward前後のジョイスティックの値 turn回転のジョイスティックの値 
-float d=0,dt=0,length,x,y,m,side,foward,turn,half=0.5,min=0.3;
+float d=0,dt=0,length,x,y,m,joy_side,joy_foward,joy_turn,half=0.5,min=0.3;
 //std_msgs::Int8 mv; // 0静止　1動作
 std_msgs::Int8MultiArray array;
+
+
+//@param side:-1~1(left:1 right:-1)  foward:-1~1(foward:1 back:-1) turn:-1~1(clockwise:1 counterclockwise:-1)
 void cal(float side,float foward,float turn){
 //joy_nodeはジョイスティックの値およびボタンのon/offを配列でパブしている。rosrun joy joy_node　してrostopic echo joy　すれば分かる。
 //joy->axes[0]が平行移動のジョイスティックの縦方向の値　joy->axes[1]平行移動のジョイスティックの横方向の値 joy->axes[2]が回転のジョイスティックの横方向の値
@@ -129,9 +132,9 @@ void cal(float side,float foward,float turn){
 void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
     
 	//joy->axesおよびjoy->bottonsの値を変数に入れる
-	side = joy->axes[0];
-	foward=joy->axes[1];
-	turn=joy->axes[3];
+	joy_side=joy->axes[0];
+	joy_foward=joy->axes[1];
+	joy_turn=joy->axes[3];
 	btn0=joy->buttons[0];
 	btn1=joy->buttons[4];
 	btn2=joy->buttons[5];
@@ -150,7 +153,7 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
     //操作量を計算する
-    cal(side,foward,turn);
+    cal(joy_side,joy_foward,joy_turn);
     ROS_INFO("d=%f",d);
     
     array.data.clear();
