@@ -2,10 +2,13 @@
 multip:Int32MultiArray型の情報をパブするプログラム(コメントアウトあり)
 multis:Int32MultiArray型の情報をサブするプログラム(コメントアウトあり)
 tr_controller:先輩からもらったコントローラの情報を使うプログラム
-tr_test:tr_controllerをもとに書いたジョイスティックの情報をメカナムホイールの制御（平行移動のみ）に置き換えホイールの制御量をパブするプログラム
-tr_multi:上記tr_testを改変し、メカナムホイールの回転の制御及びホイールの制御量をInt8MultiArray型でパブをするようにしたプログラム(コメントアウトあり)
-tr_mecanum_test:tr_multiのjoyの配列、他各種値をxboxのコントローラ用に変えたもの
-tr_mecanum:上記tr_mecanum_testを改変し操作方を変えたもの
+
+tr_multi:上記tr_testを改変し、メカナムホイールの回転の制御及びホイールの制御量をInt8MultiArray型でパブするようにしたプログラム(コメントアウトあり)
+
+mecanum_contoller:ARの足回りのコントローラのプログラム
+
+tr_mecanum:上記の操作方違い（未調整
+
 
 注意
 MultiArray型のパブサブはバッファを食うため、NANOではうまく動きづらい。Wire.hをインクルードしたらNANOではうまく動かなくなった筆者の実体験より。

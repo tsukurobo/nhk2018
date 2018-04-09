@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tr_mecanum_test)
+project(mecanum_controller)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -205,7 +205,7 @@ include_directories(
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_executable(tr_mecanum_test src/tr_mecanum_test.cpp)
-target_link_libraries(tr_mecanum_test ${catkin_LIBRARIES})
+add_executable(mecanum_controller src/mecanum_controller.cpp)
+target_link_libraries(mecanum_controller ${catkin_LIBRARIES})
 
 

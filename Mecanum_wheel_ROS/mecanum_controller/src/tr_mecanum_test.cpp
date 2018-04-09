@@ -110,16 +110,18 @@ void cal(float side,float foward,float turn){
 	w[2]=-x+y+tn;
 	w[3]=-x+y-tn;
 	w[4]=x+y+tn;
-	for(int j=1;j<5;j++){
-		w[j]=w[j];
-	}
 	
 	for(int i=1;i<5;i++){
-		if(w[i]>100){
-			w[i]=100;
+		if(abs(w[i])>100){
+			w[i]=100*w[i]/abs(w[i]);
 		}
 		else{
 		}
+		/*if(abs(w[i])<3){
+			w[i]=0;
+		}
+		else{
+		}*/
 	}	
 }
 
