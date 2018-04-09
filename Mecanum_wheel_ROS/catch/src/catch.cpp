@@ -58,24 +58,6 @@ void cal(float side,float foward,float turn){
 	else{
 	}
 	
-	//xboxのコントローラは原点に戻らないため、ブレを消去
-	if(fabs(turn)>=0.1){
-		dt=dt+turn*0.1;
-	}
-	else{
-	}
-	if(fabs(foward)<=0.05){
-		foward=0;
-	}
-	else{
-	}
-	if(fabs(side)<=0.05){
-		side=0;
-	}
-	else{
-	}
-	
-	
 	d=(atan2(foward,-(side)));//角度を割り出す。
 	
 	
@@ -117,8 +99,8 @@ void cal(float side,float foward,float turn){
 //joyの値を変数に入れる
 void camCallback(const std_msgs::Int32MultiArray::ConstPtr& image_param){
 	static float e1,e2,e3,e4;
-	const float p_gain=1,i_gain=0.3,d_gain=0.1;
-	int joy_param;
+	const float p_gain=0.1,i_gain=0.0000,d_gain=0.0000;
+	float cam_param;
 	int cam[12];
     int param = 0;
     // print all the remaining number
@@ -128,22 +110,22 @@ void camCallback(const std_msgs::Int32MultiArray::ConstPtr& image_param){
         cam[param] = *it;
         param++;
     }
-	joy_foward=0;
+	joy_side=0;
 	joy_turn=0;
-	joy_param=cam[3]-320;
-	joy_param=joy_param/320;
-	/*
-	e1=0-joy_side; 
+	cam_param=320-cam[3];
+	cam_param=cam_param/320;
+	
+	e1=0-cam_param; 
 	e2=e2+e1;
 	e3=e1-e4;
 	e4=e1;
-	joy_side=p_gain*e1+i_gain*e2+d_gain*e3;
-	if(abs(joy_side)>1){
-		joy_side=joy_side/abs(joy_side);
+	joy_foward=p_gain*e1+i_gain*e2+d_gain*e3;
+	if(abs(joy_foward)>1){
+		joy_foward=joy_foward/abs(joy_foward);
 	}
 	else{
 	}
-	*/
+	
 }
 
 int main(int argc, char **argv)
@@ -160,7 +142,7 @@ int main(int argc, char **argv)
     //操作量を計算する
     
     cal(joy_side,joy_foward,joy_turn);
-     ROS_INFO("side=%f",joy_side);
+     ROS_INFO("foward=%f",joy_foward);
     array.data.clear();
     for(int i=0;i<4;i++){
     	array.data.push_back(w[i+1]);

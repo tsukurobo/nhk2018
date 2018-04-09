@@ -73,22 +73,7 @@ void cal(float side,float foward,float turn){
 	else{
 	}
 	
-	//xboxのコントローラは原点に戻らないため、ブレを消去
-	if(fabs(turn)>=0.3){
-		dt=dt+turn*0.1;
-	}
-	else{
-	}
-	if(fabs(foward)<=0.05){
-		foward=0;
-	}
-	else{
-	}
-	if(fabs(side)<=0.05){
-		side=0;
-	}
-	else{
-	}
+	
 	
 	
 	d=(atan2(foward,-(side)));//角度を割り出す。
@@ -139,6 +124,22 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
 	btn0=joy->buttons[0];
 	btn1=joy->buttons[4];
 	btn2=joy->buttons[5];
+	//xboxのコントローラは原点に戻らないため、ブレを消去
+	if(fabs(joy_turn)<=0.05){
+		joy_turn=0;
+	}
+	else{
+	}
+	if(fabs(joy_foward)<=0.05){
+		joy_foward=0;
+	}
+	else{
+	}
+	if(fabs(joy_side)<=0.05){
+		joy_side=0;
+	}
+	else{
+	}
 
 }
 
