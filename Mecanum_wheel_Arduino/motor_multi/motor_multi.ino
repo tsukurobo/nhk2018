@@ -16,11 +16,10 @@
 #include "ise_motor_driver.h"
 
 
-
-uint8_t addr1 = 0x11;
-uint8_t addr2 = 0x12;
-uint8_t addr3 = 0x13;
-uint8_t addr4 = 0x14;
+uint8_t addr1 = 0x22;
+uint8_t addr2 = 0x20;
+uint8_t addr3 = 0x23;
+uint8_t addr4 = 0x21;
 IseMotorDriver m1 = IseMotorDriver(addr1);
 IseMotorDriver m2 = IseMotorDriver(addr2);
 IseMotorDriver m3 = IseMotorDriver(addr3);
@@ -43,7 +42,6 @@ void messageCb(const std_msgs::Int8MultiArray& array)
   w2=array.data[1];
   w3=array.data[2];
   w4=array.data[3];
- i++;
 }
 ros::Subscriber<std_msgs::Int8MultiArray>sub("array",&messageCb);
 void setup()

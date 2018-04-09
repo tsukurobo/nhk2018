@@ -16,9 +16,9 @@
 #include "ti2c.h"
 #include "ise_motor_driver.h"
 #define datalength 4294967295
-int pw[5]={0,0,0,0,0},w[6]={0,0,0,0,0,0};
+volatile int pw[5]={0,0,0,0,0},w[6]={0,0,0,0,0,0};
 long enc[5]={},Enc[5]={},Enc_a[5]={},Enc_b[5]={},n=14;///18000
-double p=0.00000000001,i=0.0,d=0.0,e1[5]={},e2[5]={},e3[5]={},e4[5]={};
+double p_gain=1.0,i_gain=0.3,d_gain=0.1,e1[5]={},e2[5]={},e3[5]={},e4[5]={};
 //0.95 2.4 0.4
 static int h=0,l=0;
 long plus=2000000000;
@@ -99,7 +99,7 @@ void cal(){
     e2[i]=e2[i]+e1[i];
     e3[i]=e1[i]-e4[i];
     e4[i]=e1[i];
-    pw[i]=p*e1[i]+i*e2[i]+d*e3[i];
+    pw[i]=p_gain*e1[i]+i_gain*e2[i]+d_gain*e3[i];
     if(abs(pw[i])>100){
       pw[i]=100*pw[i]/abs(pw[i]);
     }
@@ -111,8 +111,8 @@ void cal(){
 ros::Subscriber<std_msgs::Int8MultiArray>sub("array",&messageCb);
 void setup()
 {
-  arrayp.data_length=8;
-  arrayp.data=(int64_t*)malloc(sizeof(int64_t*)*8);
+  arrayp.data_length=12;
+  arrayp.data=(int64_t*)malloc(sizeof(int64_t*)*12);
   Wire.begin();
   //Serial.begin(9600);
   nh.initNode();
@@ -139,6 +139,10 @@ void loop()
   for(int j=0;j<4;j++){
     arrayp.data[j+4] = pw[j+1];
   }
+  for(int j=0;j<4;j++){
+    arrayp.data[j+8] = w[j+1];
+  }
+
 
   
   wparam.publish( &arrayp );
