@@ -18,7 +18,7 @@
 #define datalength 4294967295
 int pw[5]={0,0,0,0,0},w[6]={0,0,0,0,0,0};
 long enc[5]={},Enc[5]={},Enc_a[5]={},Enc_b[5]={},n=14;///18000
-double p=10,i=10,d=0.4,e1[5]={},e2[5]={},e3[5]={},e4[5]={};
+double p=0.00000000001,i=0.0,d=0.0,e1[5]={},e2[5]={},e3[5]={},e4[5]={};
 //0.95 2.4 0.4
 static int h=0,l=0;
 long plus=2000000000;
@@ -105,20 +105,14 @@ void cal(){
     }
     else{
     }
-    
-    if(pw[i]>100){
-     pw[i]=100*abs(pw[i])/pw[i]; 
-    }
-    else{
-    }
     // pw[i]=w[i];
   }
 }
 ros::Subscriber<std_msgs::Int8MultiArray>sub("array",&messageCb);
 void setup()
 {
-  arrayp.data_length=16;
-  arrayp.data=(int64_t*)malloc(sizeof(int64_t*)*16);
+  arrayp.data_length=8;
+  arrayp.data=(int64_t*)malloc(sizeof(int64_t*)*8);
   Wire.begin();
   //Serial.begin(9600);
   nh.initNode();
@@ -143,14 +137,9 @@ void loop()
     arrayp.data[j] = enc[j+1];
   }
   for(int j=0;j<4;j++){
-    arrayp.data[j+4] = Enc_a[j+1];
+    arrayp.data[j+4] = pw[j+1];
   }
-  for(int j=0;j<4;j++){
-    arrayp.data[j+8] = pw[j+1];
-  }
-  for(int j=0;j<4;j++){
-    arrayp.data[j+12] = w[j+1];
-  }
+
   
   wparam.publish( &arrayp );
   nh.spinOnce();

@@ -22,7 +22,7 @@ void IseMotorDriver::setSpeed(int power){
 
 long IseMotorDriver::encorder(){
   long count = 0;
-  char buf[50];
+  char buf[100];
   this -> ti2c.receiveStr(buf);
   count = atol(buf);
   return count;
