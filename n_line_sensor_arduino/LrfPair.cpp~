@@ -1,0 +1,20 @@
+
+#define PARALLAX 100
+#define pi 3.1415926536
+#define LRF_ERR 5000
+
+void LrfPair::getAngle(){
+  float a = distanceL - distanceR;
+  float b = PARALLAX;  // (a/b) = tan 
+  angle = atan(a/b) * (180/pi);
+
+  if(distanceL > LRF_ERR || distanceR > LRF_ERR)reliability = false;
+  else true;
+}
+
+void LrfPair::getDistance(){
+  distanceL = sensorL.readRangeContinuousMillimeters();
+  distanceR = sensorR.readRangeContinuousMillimeters();
+  distance_avr = (distanceL+distanceR)/2;
+}
+  

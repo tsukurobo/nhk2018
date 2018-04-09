@@ -1,0 +1,71 @@
+#include <VL53L0X.h>
+#include "LrfPair.h"
+#include <math.h>
+#include <Arduino.h>
+#define LONG_RANGE
+
+class LrfPair{
+ public:
+  VL53L0X sensorL,sensorR;
+  int distanceL,distanceR,distance_avr;
+  int angle;
+  int LSHUT,RSHUT;
+  bool reliability;
+
+  LrfPair(int lsh, int rsh){
+    relyability = false;
+    angle = distanceL = distanceR = distance_avr = 0;
+
+    LSHUT = lsh;
+    RSHUT = rsh;
+    
+    pinMode(13,OUTPUT);
+    digitalWrite(13,HIGH);
+
+    pinMode(lsh, OUTPUT); 
+    digitalWrite(lsh, LOW);
+ 
+    delay(100);
+    Wire.begin();
+ 
+    pinMode(lsh, INPUT);
+    delay(150);
+    sensorL.init(true);
+    delay(100);
+    sensorL.setAddress((uint8_t)(4*lsh));
+    sensorL.setTimeout(500);
+
+    pinMode(rsh, OUTPUT); 
+    digitalWrite(rsh, LOW);
+ 
+    delay(100);
+    Wire.begin();
+ 
+    pinMode(rsh, INPUT);
+    delay(150);
+    sensorR.init(true);
+    delay(100);
+    sensorR.setAddress((uint8_t)(4*rsh));
+    sensorR.setTimeout(500);
+
+    #if defined LONG_RANGE //2200くらいまでレンジを広げる
+      // lower the return signal rate limit (default is 0.25 MCPS)
+      sensorL.setSignalRateLimit(0.1);
+      // increase laser pulse periods (defaults are 14 and 10 PCLKs)
+      sensorL.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
+      sensorL.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
+
+      // lower the return signal rate limit (default is 0.25 MCPS)
+      sensorR.setSignalRateLimit(0.1);
+      // increase laser pulse periods (defaults are 14 and 10 PCLKs)
+      sensorR.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
+      sensorR.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
+    #endif
+ 
+    sensorL.startContinuous();
+    sensorR.startContinuous();
+    digitalWrite(13,LOW);
+  }
+  float getAngle();
+  float getDistance();
+}
