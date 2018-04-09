@@ -51,6 +51,7 @@ std_msgs::Int8MultiArray array;
 
 
 //@param side:-1~1(left:1 right:-1)  foward:-1~1(foward:1 back:-1) turn:-1~1(clockwise:1 counterclockwise:-1)
+//※when Parallel displacement in x degree, side=-cosin(x) foward=sin(x)
 void cal(float side,float foward,float turn){
 //joy_nodeはジョイスティックの値およびボタンのon/offを配列でパブしている。rosrun joy joy_node　してrostopic echo joy　すれば分かる。
 //joy->axes[0]が平行移動のジョイスティックの縦方向の値　joy->axes[1]平行移動のジョイスティックの横方向の値 joy->axes[2]が回転のジョイスティックの横方向の値
