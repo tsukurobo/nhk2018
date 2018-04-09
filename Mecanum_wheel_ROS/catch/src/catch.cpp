@@ -1,4 +1,7 @@
 #include "ros/ros.h"
+#include <stdio.h>
+#include <vector>
+#include <iostream>
 #include <stdlib.h>
 #include <math.h>
 #include "std_msgs/String.h"
@@ -6,25 +9,12 @@
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
 #include "std_msgs/Int8MultiArray.h"
+#include "std_msgs/Int32MultiArray.h"
 #include <sstream>
 #define THRESHOLD 0.2
 #define DEFAULTPW 100
 #define MAXPW 150
 
-
-
-//このプログラムではxboxのコントローラをつかいました。よってjoyの配列の値が少々異なります。
-//ジョイスティックの可動範囲が円になっているため、spの値を中心からの移動量にしました。
-
-
-
-//回転による平行移動の補正のパラメータ調整が済んでいません。暇な人は調整お願いします。
-
-
-
-
-//コメントアウトはmultipi及びmultisを読んでいるものとして書く。
-//下記は平行移動の際のホイールの回転方向（１は順回転−１は逆回転）
 
 //前
 //1 1
@@ -42,12 +32,11 @@
 //-1-1
 //-1-1
 
-//w[]はホイールの制御量 maxは|w[]|の最大数 spは平行移動の速度（0~1） tnは回転の速度 c平行強度 t回転強度 btn1&btn2ボタンの値  m及びtは下の計算式参照。これにより制御の平行移動(m)と回転(t)の比重を変える。
 int w[5],max,sp,tn,c=48,t=25,btn0,btn1,btn2;
-//d角度 dt角度に加算する角度 lengthジョイスティックの傾き x横方向の操作量 y縦方向の操作量 m係数 side左右のジョイスティックの値 foward前後のジョイスティックの値 turn回転のジョイスティックの値 
 float d=0,dt=0,length,x,y,m,joy_side,joy_foward,joy_turn,half=0.5,min=0.3;
 //std_msgs::Int8 mv; // 0静止　1動作
 std_msgs::Int8MultiArray array;
+
 
 
 //@param side:-1~1(left:1 right:-1)  foward:-1~1(foward:1 back:-1) turn:-1~1(clockwise:1 counterclockwise:-1)
@@ -55,10 +44,6 @@ std_msgs::Int8MultiArray array;
 void cal(float side,float foward,float turn){
 //joy_nodeはジョイスティックの値およびボタンのon/offを配列でパブしている。rosrun joy joy_node　してrostopic echo joy　すれば分かる。
 //joy->axes[0]が平行移動のジョイスティックの縦方向の値　joy->axes[1]平行移動のジョイスティックの横方向の値 joy->axes[2]が回転のジョイスティックの横方向の値
-
-	
-	
-	
 	//三角関数を用いて並行方向の操作量を求める。
 	//d=角度　joy->axes[3]の量により、これに補正をかける。
 	//左右のボタンが同時に押されている時
@@ -74,7 +59,7 @@ void cal(float side,float foward,float turn){
 	}
 	
 	//xboxのコントローラは原点に戻らないため、ブレを消去
-	if(fabs(turn)>=0.3){
+	if(fabs(turn)>=0.1){
 		dt=dt+turn*0.1;
 	}
 	else{
@@ -130,23 +115,42 @@ void cal(float side,float foward,float turn){
 }
 
 //joyの値を変数に入れる
-void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
-    
-	//joy->axesおよびjoy->bottonsの値を変数に入れる
-	joy_side=joy->axes[0];
-	joy_foward=joy->axes[1];
-	joy_turn=joy->axes[3];
-	btn0=joy->buttons[0];
-	btn1=joy->buttons[4];
-	btn2=joy->buttons[5];
-
+void camCallback(const std_msgs::Int32MultiArray::ConstPtr& image_param){
+	static float e1,e2,e3,e4;
+	const float p_gain=1,i_gain=0.3,d_gain=0.1;
+	int joy_param;
+	int cam[12];
+    int param = 0;
+    // print all the remaining number
+    //データの始まりから、終わりまで
+    for(std::vector<int>::const_iterator it = image_param->data.begin(); it != image_param->data.end(); ++it)
+    {   //cam[i]に*it(array.data[i]の中身)を入れる
+        cam[param] = *it;
+        param++;
+    }
+	joy_foward=0;
+	joy_turn=0;
+	joy_param=cam[3]-320;
+	joy_param=joy_param/320;
+	/*
+	e1=0-joy_side; 
+	e2=e2+e1;
+	e3=e1-e4;
+	e4=e1;
+	joy_side=p_gain*e1+i_gain*e2+d_gain*e3;
+	if(abs(joy_side)>1){
+		joy_side=joy_side/abs(joy_side);
+	}
+	else{
+	}
+	*/
 }
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "controller");
   ros::NodeHandle n;
-  ros::Subscriber joy = n.subscribe("joy",1000,joyCallback);
+  ros::Subscriber image_param = n.subscribe("image_param",1000,camCallback);
   ros::Publisher pub = n.advertise<std_msgs::Int8MultiArray>("array", 100);
   ros::Rate loop_rate(10);
   int count = 0;
@@ -154,9 +158,9 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
     //操作量を計算する
-    cal(joy_side,joy_foward,joy_turn);
-    ROS_INFO("d=%f",d);
     
+    cal(joy_side,joy_foward,joy_turn);
+     ROS_INFO("side=%f",joy_side);
     array.data.clear();
     for(int i=0;i<4;i++){
     	array.data.push_back(w[i+1]);

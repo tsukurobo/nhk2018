@@ -9,6 +9,8 @@ mecanum_contoller:ARの足回りのコントローラのプログラム
 
 tr_mecanum:上記の操作方違い（未調整
 
+catch:シャトルコック受け渡しのプログラム
+
 
 注意
 MultiArray型のパブサブはバッファを食うため、NANOではうまく動きづらい。Wire.hをインクルードしたらNANOではうまく動かなくなった筆者の実体験より。
