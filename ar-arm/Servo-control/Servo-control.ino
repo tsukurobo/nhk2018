@@ -1,8 +1,8 @@
 #include <Servo.h>
 #define L_arm1_PIN 13
-#define L_arm2_PIN 12
+#define L_arm2_PIN 12//はずしたとおもう
 #define S_arm1_PIN 11
-#define S_arm2_PIN 10
+#define S_arm2_PIN 10//はずしたとおもう
 
 #define L1_INIT 0
 #define L2_INIT 0

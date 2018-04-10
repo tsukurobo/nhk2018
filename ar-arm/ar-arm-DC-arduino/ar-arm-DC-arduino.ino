@@ -35,14 +35,14 @@ void DC_Control1(long n){
 
   if(dif>100 ){
 
-    speednum =50;
+    speednum =30;
 
     
     }
 
   if(dif <-100){
 
-    speednum = -50;
+    speednum = -30;
     
     }
   
