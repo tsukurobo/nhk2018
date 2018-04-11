@@ -7,13 +7,6 @@
 #include "ti2c.h"
 #include "ise_motor_driver.h"
 #include <Wire.h>
-#define DC2_INIT 0
-#define DC2_PASS 530
-
-#define DC1_INIT 0
-#define DC1_PICK1 -1700
-#define DC1_PICK2 -6000
-#define DC1_PASS  -3500
 
 uint8_t addr1 = 0x24;
 uint8_t addr2 = 0x25;
@@ -33,16 +26,16 @@ void DC_Control1(long n){
 
   int speednum = 0;
 
-  if(dif>100 ){
+  if(dif>200 ){
 
-    speednum =30;
+    speednum =100;
 
     
     }
 
-  if(dif <-100){
+  if(dif <-200){
 
-    speednum = -30;
+    speednum = -100;
     
     }
   
@@ -56,26 +49,26 @@ void DC_Control1(long n){
 
 void DC_Control2(long k){
 
-  long val2 = m2.encorder();
+  long val = m2.encorder();
 
-  long dif2 = val2-k;
+  long dif = val-k;
 
-  int speednum2 = 0;
+  int speednum = 0;
 
-  if(dif2>10 ){
+  if(dif>10 ){
 
-    speednum2 =50;
+    speednum =100;
 
     
     }
 
-  if(dif2 <-10){
+  if(dif <-10){
 
-    speednum2 = -50;
+    speednum = -100;
     
     }
   
-  m2.setSpeed(speednum2);
+  m2.setSpeed(speednum);
   
   
   
@@ -83,44 +76,50 @@ void DC_Control2(long k){
 
 void No_2(){
 
-  DC_Control2(DC2_INIT);
+  DC_Control2();
   
   }
 
 void No_3(){
   
-  DC_Control1(DC1_PICK1);
-  
-  }
-
-void No_3_B(){
-  
-  DC_Control1(DC1_PICK2);
+  DC_Control1();
   
   }
 
 void No_5(){
 
-  DC_Control1(DC1_INIT);
+  DC_Control1();
   
   
   }
 
 void No_6(){
   
-  DC_Control1(DC1_PASS);
-  DC_Control2(DC2_PASS);
+  DC_Control1();
+  DC_Control2();
   
   }
 
 void No_8(){
   
-  DC_Control1(DC1_INIT);
-  DC_Control2(DC2_INIT);
+  DC_Control2();
   
   }
 
+void No_9(){
 
+  DC_Control1();
+  DC_Control2();
+  
+  }
+
+void No_11(){
+
+  DC_Control1();
+  DC_Control2();
+  
+  
+  }
 
 
 
@@ -131,16 +130,17 @@ void Callback(const std_msgs::Int16& a){
      
 }
 
-ros::Subscriber<std_msgs::Int16> num("num",Callback);
+ros::Subscriber<std_msgs::Int16> dc("dc",Callback);
 
 
 void setup() {
+
   Wire.begin();
   delay(1000);
 
   nh.initNode();
 
-  nh.subscribe(num);
+  nh.subscribe(dc);
   // put your setup code here, to run once:
 
 }
@@ -156,12 +156,6 @@ void loop() {
    if(triger == 3){
 
     No_3();
-    
-    }
-
-    if(triger == 13){
-
-    No_3_B();
     
     }
 
@@ -184,10 +178,21 @@ void loop() {
     
     }
 
+   if(triger == 9){
+
+    No_9();
+    
+    }
 
 
-  
-  
+
+   if(triger == 11){
+
+    No_11();
+    
+    }
+
+
   nh.spinOnce();
 
   // put your main code here, to run repeatedly:

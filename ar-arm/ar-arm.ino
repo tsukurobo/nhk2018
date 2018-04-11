@@ -2,10 +2,9 @@
 #include "ise_motor_driver.h"
 #include <Wire.h>
 
-
-#define FIN 0
-
-uint8_t addr1 = 0x25;
+#define FIN 5000
+#define INIT 5304
+uint8_t addr1 = 0x24;
 
 
 IseMotorDriver m1 = IseMotorDriver(addr1);
@@ -32,16 +31,16 @@ void loop() {
 
   int speednum = 0;
 
-  if(dif>10 ){
+  if(dif>100 ){
 
-    speednum =50;
+    speednum =100;
 
     
     }
 
-  if(dif <-10){
+  if(dif <-500){
 
-    speednum = -50;
+    speednum = -100;
     
     }
 
