@@ -9,6 +9,7 @@
 #include "std_msgs/MultiArrayDimension.h"
 #include "std_msgs/Int16MultiArray.h"
 #include "std_msgs/Int8MultiArray.h"
+#include "std_msgs/Float32MultiArray.h"
 #include <VL53L0X.h>
 
 #define LINE_THRESHOLD 800
@@ -64,10 +65,12 @@ std_msgs::Int8MultiArray req_arr;  //{FOWARD,SIDE,TURN}
 int fw_req,sd_req,turn_req; //-1->CCW  0->STOP(ON_LINE) 1->CW
 ros::Publisher req_pub("req",&req_arr);
 
-std_msgs::Int16MultiArray ch_arr0;
-ros::Publisher sensor_chatter0("ch0",&ch_arr0);
-std_msgs::Int16MultiArray ch_arr1;
-ros::Publisher sensor_chatter1("ch1",&ch_arr1);
+std_msgs::Int8MultiArray lines;
+ros::Publisher line_pub("line_param",&lines);
+std_msgs::Float32MultiArray lrfs;
+ros::Publisher lrf_pub("lrf_param",&lrfs);
+
+int weight_map[LINE_SENSOR_ALL_SUM] = {-4,-3,-2,-1,1,2,3,4};
 
 void load_default_thresh(){
   for(int i=0;i<LINE_SENSOR_ALL_SUM;i++){
@@ -100,6 +103,21 @@ void sumup_weight(){//ロボット視点で左半分は負、右半分は正で�
         sensors_weight[i] -= is_online[i][j];
       else
         sensors_weight[i] += is_online[i][j];
+    }
+  }
+}
+
+void check_weight(){
+  int max_weight_l[SENSORGROUP_SUM] = {0,0,0,0};
+  int max_weight_r[SENSORGROUP_SUM] = {0,0,0,0};
+  for(int i = 0; i<SENSORGROUP_SUM; i++){
+    for(int j=0;j<LINE_SENSOR_ALL_SUM; j++){
+      if(j<LINE_SENSOR_ALL_SUM/2){ 
+        if(is_online[i][j] && max_weight_l[i] > weight_map[j])max_weight_l[i] = weight_map[j];
+      }else{
+        if(is_online[i][j] && max_weight_r[i] < weight_map[j])max_weight_r[i] = weight_map[j];
+      }
+      sensors_weight[i] = max_weight_l[i] + max_weight_r[i];
     }
   }
 }
@@ -159,6 +177,19 @@ void set_mecanum_requests(){
   req_arr.data[TURN] = turn_req;
 }
 
+void set_publish_data(){
+  for(int i=0;i<SENSORGROUP_SUM;i++){
+    lines.data[i] = sensors_weight[i];
+  }
+  lrfs.data[0] = pairA->angle;//角度正面
+  lrfs.data[1] = pairB->angle;//角度側面
+  lrfs.data[2] = pairA->distanceL;//距離正面L
+  lrfs.data[3] = pairA->distanceR;//距離正面R
+  lrfs.data[4] = pairB->distanceL;//距離側面L
+  lrfs.data[5] = pairB->distanceR;//距離側面R
+  
+}
+
 void setup() {
   // put your setup code here, to run once:
   Wire.begin();
@@ -167,15 +198,15 @@ void setup() {
   req_arr.data_length=REQUESTS_NUM;
   req_arr.data=(int8_t*)malloc(sizeof(int8_t*)*REQUESTS_NUM);
 
-  ch_arr0.data_length = LINE_SENSOR_ALL_SUM;
-  ch_arr0.data=(int16_t*)malloc(sizeof(int16_t*)*LINE_SENSOR_ALL_SUM);
-  ch_arr1.data_length = LINE_SENSOR_ALL_SUM;
-  ch_arr1.data=(int16_t*)malloc(sizeof(int16_t*)*LINE_SENSOR_ALL_SUM);
+  lines.data_length = SENSORGROUP_SUM;
+  lines.data=(int8_t*)malloc(sizeof(int8_t*)*SENSORGROUP_SUM);
+  lrfs.data_length = 6;
+  lrfs.data=(float*)malloc(sizeof(float*)*6);
   
   nh.initNode();
   nh.advertise(req_pub);
-  nh.advertise(sensor_chatter0);
-  nh.advertise(sensor_chatter1);
+  nh.advertise(lrf_pub);
+  nh.advertise(line_pub);
 }
 
 
@@ -192,13 +223,14 @@ void loop() {
     lineSensor[i].lineSensor(line_sensor_value[i]);
   }
   set_sensor_status();
-  sumup_weight();
-
-  set_mecanum_requests();
-  req_pub.publish(&req_arr);
+  //sumup_weight();
+  check_weight();
+  set_publish_data();
+  //set_mecanum_requests();
+  //req_pub.publish(&req_arr);
   
-  sensor_chatter0.publish(&ch_arr0);
-  sensor_chatter1.publish(&ch_arr1);
+  line_pub.publish(&lines);
+  lrf_pub.publish(&lrfs);
 
   nh.spinOnce();
   delay(100);
