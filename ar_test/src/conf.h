@@ -7,6 +7,35 @@ enum ServoStatus {
   SERVO_TZ1SHOT = 3,
   SERVO_TZ2SHOT = 4,
   SERVO_TZ3SHOT = 5,
+  SERVO_FREE = 6,
+  SERVO_PICK = 7,
+};
+
+enum UseLRF{
+	USE_LEFT_LRF = 0,
+	USE_FRONT_LRF = 1,
+	DO_NOT_USE_LRF = 2,
+};
+
+enum UseLine{
+	 USE_LINE = 0,
+	 DO_NOT_USE_LINE = 1,
+};
+
+enum ArmStatus{
+	ARM_PREPARE = 2,
+	ARM_PRE_FRONT= 3,
+	ARM_PRE_BACK= 13,
+	ARM_RETURN= 5,
+	ARM_PASS= 6,
+	ARM_INIT= 8,
+};
+
+enum Degree {
+	RIGHT =0,
+	FRONT = 90,
+	LEFT = 180,
+	BACK = -90,
 };
 
 enum Status {
@@ -27,8 +56,8 @@ enum Status {
   PASS3TOSHOT3 = 131,
   SHOT3 = 141,
   // end: after care.
-  PASS3TOSHOT2 = 151,
-  SHOT3TOPASS3 = 161, 
+  SHOT3TOPASS3 = 151, 
+  PASS3TOSHOT2 = 161,
 };
 
 enum Tasks {

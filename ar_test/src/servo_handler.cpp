@@ -13,7 +13,7 @@ const int servoSum = 7;
 const int closeDeg = 0; // close deg
 const int openDeg = 90;   // open deg
 const int hz = 10;
-const int b = 0, c = 1, d = 2, e = 3, f = 4, g = 5, h = 6;
+const int b = 0, c = 1, d = 2, e = 3, f = 4, g = 5, h = 6,pick_up=7,pick_down=8;
 const int delaySmall = 500, delayMedium = 1000, delayLong = 1500, delayShot = 5000, delayReset = 3000;
 
 // inner values
@@ -230,6 +230,23 @@ void tz3() {
 
 }
 
+void free(){
+	sendArr(pick_up,30);
+	sendArr(pick_down,30);
+	state = SERVO_WAIT;
+	servop.data=state;
+        servoPub.publish(servop);
+}
+
+void pick(){
+	sendArr(pick_up,0);
+	sendArr(pick_down,0);
+	state = SERVO_WAIT;
+	servop.data=state;
+        servoPub.publish(servop);
+}
+
+
 
 void task() {
   //  ROS_INFO("task");
@@ -243,6 +260,10 @@ void task() {
     tz2();
   } else if (state == SERVO_TZ3SHOT) {
     tz3();
+  } else if (state == SERVO_PICK) {
+    pick();
+  } else if (state == SERVO_FREE) {
+    free();
   }
   
 }
