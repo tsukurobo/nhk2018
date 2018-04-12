@@ -15,6 +15,7 @@ std_msgs::Int8 servoTask;
 std_msgs::Int8 motorState;
 std_msgs::Int8 armState;
 
+ros::NodeHandle n;
 ros::Rate loop_rate(10);
 
 /*
@@ -61,19 +62,6 @@ static const int taskFlow[1000] = {
 };
 
 
-void delayCount() {
-  if (delayCounter > 0) {
-    delayCounter--;
-  } else {
-    delaying = false;
-  }
-}
-
-void delay(int ms) {
-  ROS_INFO("delay");
-  delayCounter = (ms*hz/1000);
-  delaying = true;  
-}
 
 
 
@@ -165,20 +153,14 @@ void pass1() {
 	//pass
 	armState.data=ARM_PRE_FRONT;
 	num_pub.publish(armState);
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 	//catch
 	state=nextTask();
 	
 	armState.data=ARM_RETURN;
 	num_pub.publish(armState);
 	
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 	
 
 	state=nextTask();
@@ -192,16 +174,10 @@ void pass1ToShot1() {
 	
 	armState.data=ARM_PASS;
 	num_pub.publish(armState);
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 	armState.data=ARM_INIT;
 	num_pub.publish(armState);
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 	
 	
 	state=nextTask();
@@ -237,10 +213,7 @@ void pass2() {
 	
 	armState.data=ARM_PRE_FRONT;
 	num_pub.publish(armState);
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 	
 
 	//watch and select
@@ -259,10 +232,7 @@ void pass2() {
 	}
 	armState.data=ARM_RETURN;
 	num_pub.publish(armState);
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 }
 //9
 void pass2ToShot2() {
@@ -274,19 +244,13 @@ void pass2ToShot2() {
 	num_pub.publish(armState);
 	armState.data=ARM_RETURN;
 	num_pub.publish(armState);
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 	
 	armState.data=ARM_INIT;
 	num_pub.publish(armState);
 	armState.data=ARM_RETURN;
 	num_pub.publish(armState);
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 	
 	
 }
@@ -321,10 +285,7 @@ void pass3() {
 	
 	armState.data=ARM_PRE_FRONT;
 	num_pub.publish(armState);
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 	
 
 	//watch and select
@@ -344,10 +305,7 @@ void pass3() {
 	
 	armState.data=ARM_RETURN;
 	num_pub.publish(armState);
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 }
 //14
 void pass3ToShot3() {
@@ -381,16 +339,10 @@ void pass3ToShot2() {
 
 	armState.data=ARM_PASS;
 	num_pub.publish(armState);
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 	armState.data=ARM_INIT;
 	num_pub.publish(armState);
-	delay(1000);
-	while(delaying){
-		delayCount();
-	}
+	ros::Duration(3).sleep();
 	
 }
 
@@ -449,7 +401,6 @@ void task() {
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "main");
-  ros::NodeHandle n;
   state_pub = n.advertise<std_msgs::Int8>("state", 100);
   servo_pub = n.advertise<std_msgs::Int8>("servo_task", 100);
   num_pub = n.advertise<std_msgs::Int8>("num", 100);

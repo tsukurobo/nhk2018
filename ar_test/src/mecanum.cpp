@@ -10,7 +10,11 @@
 #include <sstream>
 #include "conf.h"
 
+
+ros::NodeHandle n;
 ros::Rate loop_rate(10);
+
+
 // publishers
 
 ros::Subscriber state_sub;
@@ -143,6 +147,7 @@ void delay(int ms) {
 void set(){
 	float set_length, set_degree, vertical_gravity, horizonal_gravity;
 	int n=8;//powar of set 
+	delay(500);
 	while(delaying){
 		vertical_gravity=(line_param[0]+line_param[2])/n;
 		horizonal_gravity=(line_param[1]+line_param[3])/n;
@@ -151,8 +156,8 @@ void set(){
 		calcMotorPower(set_degree,set_length,USE_FRONT_LRF,DO_NOT_USE_LINE);
 	  	ros::spinOnce();
 	  	loop_rate.sleep();
-	  	delay(500);
-	  	delayCount();
+	  	ros::Duration(0.1).sleep();
+  		delayCount();
 	}
 }
 
@@ -187,24 +192,19 @@ void lrfCallback(const std_msgs::Float32MultiArray::ConstPtr& lrfpm)
 void startToPass1(){
   for(int i=0;i<10;i++){
 	  calcMotorPower(-80, i*0.1, USE_LEFT_LRF, DO_NOT_USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
+  delay(1000);
   while(delaying){
   	calcMotorPower(-80, 1, USE_LEFT_LRF, DO_NOT_USE_LINE);
   	ros::spinOnce();
   	loop_rate.sleep();
-  	delay(1000);
+  	ros::Duration(0.1).sleep();
   	delayCount();
   }
   for(int i=0;i<7;i++){
 	  calcMotorPower(-80, 1-i*0.1, USE_LEFT_LRF, DO_NOT_USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
   while(line_param[1]!=0){
   	calcMotorPower(-80, 0.3, USE_LEFT_LRF, DO_NOT_USE_LINE);
@@ -216,24 +216,19 @@ void startToPass1(){
 void pass1ToShot1(){
   for(int i=0;i<10;i++){\
 	  calcMotorPower(RIGHT, i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
+  delay(1000);
   while(delaying){
   	calcMotorPower(RIGHT, 1, DO_NOT_USE_LRF, USE_LINE);
   	ros::spinOnce();
   	loop_rate.sleep();
-  	delay(1000);
+  	ros::Duration(0.1).sleep();
   	delayCount();
   }
   for(int i=0;i<7;i++){
 	  calcMotorPower(RIGHT, 1-i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
   while(line_param[0]!=0){
   	calcMotorPower(RIGHT, 0.3, USE_FRONT_LRF, USE_LINE);
@@ -248,24 +243,19 @@ void pass1ToShot1(){
 void shot1ToPass2(){
  for(int i=0;i<10;i++){
 	  calcMotorPower(LEFT, i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
+  delay(1000);
   while(delaying){
   	calcMotorPower(LEFT, 1, DO_NOT_USE_LRF, USE_LINE);
   	ros::spinOnce();
   	loop_rate.sleep();
-  	delay(1000);
+  	ros::Duration(0.1).sleep();
   	delayCount();
   }
   for(int i=0;i<7;i++){
 	  calcMotorPower(LEFT, 1-i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
   while(line_param[3]!=0){
   	calcMotorPower(LEFT, 0.3, DO_NOT_USE_LRF, USE_LINE);
@@ -277,24 +267,19 @@ void shot1ToPass2(){
 void pass2ToShot2(){
   for(int i=0;i<10;i++){
 	  calcMotorPower(-40, i*0.1, USE_LEFT_LRF, DO_NOT_USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
+  delay(1000);
   while(delaying){
   	calcMotorPower(-40, 1, USE_LEFT_LRF, DO_NOT_USE_LINE);
   	ros::spinOnce();
   	loop_rate.sleep();
-  	delay(1000);
+  	ros::Duration(0.1).sleep();
   	delayCount();
   }
   for(int i=0;i<7;i++){
 	  calcMotorPower(-40, 1-i*0.1, USE_LEFT_LRF, DO_NOT_USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
   
   while(line_param[1]!=0){
@@ -305,24 +290,19 @@ void pass2ToShot2(){
   
   for(int i=0;i<10;i++){
 	  calcMotorPower(RIGHT, i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
+  delay(1000);
   while(delaying){
   	calcMotorPower(RIGHT, 1, DO_NOT_USE_LRF, USE_LINE);
   	ros::spinOnce();
   	loop_rate.sleep();
-  	delay(1000);
+  	ros::Duration(0.1).sleep();
   	delayCount();
   }
   for(int i=0;i<7;i++){
 	  calcMotorPower(RIGHT, 1-i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
   while(line_param[0]!=0){
   	calcMotorPower(RIGHT, 0.3, USE_FRONT_LRF, USE_LINE);
@@ -335,24 +315,19 @@ void pass2ToShot2(){
 void shot2ToPass3(){
   for(int i=0;i<10;i++){
 	  calcMotorPower(LEFT, i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
+  delay(1000);
   while(delaying){
   	calcMotorPower(LEFT, 1, DO_NOT_USE_LRF, USE_LINE);
   	ros::spinOnce();
   	loop_rate.sleep();
-  	delay(1000);
+  	ros::Duration(0.1).sleep();
   	delayCount();
   }
   for(int i=0;i<7;i++){
 	  calcMotorPower(LEFT, 1-i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
   while(line_param[0]!=0){
   	calcMotorPower(LEFT, 0.3, USE_FRONT_LRF, USE_LINE);
@@ -364,24 +339,19 @@ void shot2ToPass3(){
 void pass3ToShot3(){
   for(int i=0;i<10;i++){
 	  calcMotorPower(RIGHT, i*0.1, USE_LEFT_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
+  delay(1000);
   while(delaying){
   	calcMotorPower(RIGHT, 1, USE_LEFT_LRF, USE_LINE);
   	ros::spinOnce();
   	loop_rate.sleep();
-  	delay(1000);
+  	ros::Duration(0.1).sleep();
   	delayCount();
   }
   for(int i=0;i<7;i++){
 	  calcMotorPower(RIGHT, 1-i*0.1, USE_LEFT_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
   while(line_param[1]!=0){
   	calcMotorPower(RIGHT, 0.3, USE_FRONT_LRF, USE_LINE);
@@ -393,24 +363,19 @@ void pass3ToShot3(){
 void shot3ToPass3(){
   for(int i=0;i<10;i++){
 	  calcMotorPower(LEFT, i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
+  delay(1000);
   while(delaying){
   	calcMotorPower(LEFT, 1, DO_NOT_USE_LRF, USE_LINE);
   	ros::spinOnce();
   	loop_rate.sleep();
-  	delay(1000);
+  	ros::Duration(0.1).sleep();
   	delayCount();
   }
   for(int i=0;i<7;i++){
 	  calcMotorPower(LEFT, 1-i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
   while(line_param[0]!=0){
   	calcMotorPower(LEFT, 0.3, DO_NOT_USE_LRF, USE_LINE);
@@ -421,24 +386,19 @@ void shot3ToPass3(){
 void pass3ToShot2(){
   for(int i=0;i<10;i++){
 	  calcMotorPower(RIGHT, i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
+  delay(1000);
   while(delaying){
   	calcMotorPower(RIGHT, 1, DO_NOT_USE_LRF, USE_LINE);
   	ros::spinOnce();
   	loop_rate.sleep();
-  	delay(1000);
+  	ros::Duration(0.1).sleep();
   	delayCount();
   }
   for(int i=0;i<7;i++){
 	  calcMotorPower(RIGHT, 1-i*0.1, DO_NOT_USE_LRF, USE_LINE);
-	  delay(100);
-	  while(delaying){
-	  	delayCount();
-	  }
+	  ros::Duration(3).sleep();
   }
   while(line_param[1]!=0){
   	calcMotorPower(RIGHT, 0.3, USE_FRONT_LRF, USE_LINE);
@@ -500,7 +460,6 @@ void move(){
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "mecanum_auto");
-  ros::NodeHandle n;
   pub = n.advertise<std_msgs::Int8MultiArray>("mecanum_motors", 100);
   state_pub = n.advertise<std_msgs::Int8>("state", 100);
   state_sub = n.subscribe("state",100,stateCallback);
