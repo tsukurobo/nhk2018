@@ -22,7 +22,7 @@ double p=10,i=10,d=0.4,e1[5]={},e2[5]={},e3[5]={},e4[5]={};
 static int h=0,l=0;
 long plus=2000000000;
 long minus=-2000000000;
-uint8_t addr1 = 0x21;
+uint8_t addr1 = 0x26;
 
 
 IseMotorDriver m1 = IseMotorDriver(addr1);
@@ -43,11 +43,12 @@ ros::Publisher wparam("wparam", &arrayp);
 void messageCb(const std_msgs::Int8MultiArray& array)
 {
   for(int i=0;i<5;i++){
+     
     w[i+1]=array.data[i];   
   }
   
   //-2,147,483,648 ～ 2,147,483,647
-  
+  Enc_b[1]=m1.encorder();
   Enc_a[1] = m1.encorder();
   
   //encorder foward +4-
@@ -73,7 +74,7 @@ void messageCb(const std_msgs::Int8MultiArray& array)
   else{
     enc[1]=(Enc_a[1]-Enc_b[1])/n;
   }
-  Enc_b[1]=Enc_a[1];
+ 
   pw[1]=w[1];
 }
 ros::Subscriber<std_msgs::Int8MultiArray>sub("array",&messageCb);

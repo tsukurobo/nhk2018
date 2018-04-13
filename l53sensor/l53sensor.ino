@@ -9,8 +9,8 @@ VL53L0X sensorR;
 VL53L0X sensorL;
 int L_distance,R_distance;
  
-#define LSHUT 6
-#define RSHUT 9
+#define LSHUT 30
+#define RSHUT 34
 
 double getAngle(int l, int r){
   double a = l-r;
@@ -59,14 +59,14 @@ void setup() {
 #endif
  
   sensorL.startContinuous();
-  sensorR.startContinuous();
+  //sensorR.startContinuous();
   digitalWrite(13,LOW);
  
   Serial.begin(19200);
 }
  
 void loop(){
-  R_distance = sensorR.readRangeContinuousMillimeters();
+  //R_distance = sensorR.readRangeContinuousMillimeters();
   L_distance = sensorL.readRangeContinuousMillimeters();
   Serial.print("R:");
   Serial.print(R_distance);
