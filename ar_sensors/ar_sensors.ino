@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include "n_line_sensor.h"
-//#include "LrfPair.h"
-/*#include <ros.h>
+#include "LrfPair.h"
+#include <ros.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Int8.h>
@@ -10,7 +10,7 @@
 #include "std_msgs/Int16MultiArray.h"
 #include "std_msgs/Int8MultiArray.h"
 #include "std_msgs/Float32MultiArray.h"
-//#include <VL53L0X.h>*/
+//#include <VL53L0X.h>
 
 #define LINE_THRESHOLD 800
 #define LINE_SENSOR_ALL_SUM 8 // LINE_SENSOR_AVR_SUM * 2
@@ -59,19 +59,19 @@ int line_sensor_thresh[LINE_SENSOR_ALL_SUM];
 boolean is_online[SENSORGROUP_SUM][LINE_SENSOR_ALL_SUM];//0->off 1->on
 int sensors_weight[SENSORGROUP_SUM];//ロボット視点で左半分は負、右半分は正でそのセンサー郡の重みを記録する
 
-//ros::NodeHandle nh;*/
+ros::NodeHandle nh;
 
-//LrfPair* pairA = new LrfPair(A_LSHUT,A_RSHUT);
-//LrfPair* pairB = new LrfPair(B_LSHUT,B_RSHUT);
+LrfPair* pairA = new LrfPair(A_LSHUT,A_RSHUT);
+LrfPair* pairB = new LrfPair(B_LSHUT,B_RSHUT);
 
-/*std_msgs::Int8MultiArray req_arr;  //{FOWARD,SIDE,TURN}
+std_msgs::Int8MultiArray req_arr;  //{FOWARD,SIDE,TURN}
 int fw_req,sd_req,turn_req; //-1->CCW  0->STOP(ON_LINE) 1->CW
 ros::Publisher req_pub("req",&req_arr);
 
 std_msgs::Int8MultiArray lines;
 ros::Publisher line_pub("line_param",&lines);
 std_msgs::Float32MultiArray lrfs;
-ros::Publisher lrf_pub("lrf_param",&lrfs);*/
+ros::Publisher lrf_pub("lrf_param",&lrfs);
 
 int weight_map[LINE_SENSOR_ALL_SUM] = {-4,-3,-2,-1,1,2,3,4};
 
@@ -128,7 +128,7 @@ void check_weight(){
   }
 }
 
-/*void set_turn_req(float ang_a, float ang_b){//壁までの距離が一番近い面のみを参照して角度調整する。
+void set_turn_req(float ang_a, float ang_b){//壁までの距離が一番近い面のみを参照して角度調整する。
   if(pairA->reliability && !(pairB->reliability)){
     if(ang_a < -THRESHOLD)turn_req = CCW;
     else if(ang_a > THRESHOLD)turn_req = CW;
@@ -149,9 +149,9 @@ void check_weight(){
       else turn_req = 0;
     }
   }
-}*/
+}
 
-/*void set_fwsd_req(){
+void set_fwsd_req(){
   int fw_weight[2] = {0,0};
   int sd_weight[2] = {0,0};
   int fwcnt = 0;
@@ -175,85 +175,58 @@ void check_weight(){
 }
 
 void set_mecanum_requests(){ 
-  //set_turn_req(pairA->angle,pairB->angle);
+  set_turn_req(pairA->angle,pairB->angle);
   set_fwsd_req();
 
   req_arr.data[FOWARD] = fw_req;
   req_arr.data[SIDE] = sd_req;
-  //req_arr.data[TURN] = turn_req;
-}*/
+  req_arr.data[TURN] = turn_req;
+}
 
-/*void set_publish_data(){
+void set_publish_data(){
   for(int i=0;i<SENSORGROUP_SUM;i++){
     lines.data[i] = sensors_weight[i];
   }
-  /*lrfs.data[0] = pairA->angle;//角度正面
+  lrfs.data[0] = pairA->angle;//角度正面
   lrfs.data[1] = pairB->angle;//角度側面
   lrfs.data[2] = pairA->distanceL;//距離正面L
   lrfs.data[3] = pairA->distanceR;//距離正面R
   lrfs.data[4] = pairB->distanceL;//距離側面L
   lrfs.data[5] = pairB->distanceR;//距離側面R
   
-}*/
+}
 
 void setup() {
   // put your setup code here, to run once:
-    /*pinMode(13,OUTPUT);
-    digitalWrite(13,HIGH);
-
-    pinMode(A_LSHUT, OUTPUT); 
-    digitalWrite(A_LSHUT, LOW);
- 
-    delay(100);
-    Wire.begin();
- 
-    pinMode(A_LSHUT, INPUT);
-    delay(150);
-    pairA->sensorL.init(true);
-    delay(100);
-    pairA->sensorL.setAddress((uint8_t)(4*A_LSHUT));
-    pairA->sensorL.setTimeout(500);
-
-
-    #if defined LONG_RANGE //2200くらいまでレンジを広げる
-      // lower the return signal rate limit (default is 0.25 MCPS)
-      pairA->sensorL.setSignalRateLimit(0.1);
-      // increase laser pulse periods (defaults are 14 and 10 PCLKs)
-      pairA->sensorL.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
-      pairA->sensorL.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
-
-    #endif
- 
-    pairA->sensorL.startContinuous();*/
     
   Wire.begin();
   init_vars();
   load_default_thresh();
-  //req_arr.data_length=REQUESTS_NUM;
-  //req_arr.data=(int8_t*)malloc(sizeof(int8_t*)*REQUESTS_NUM);
+  req_arr.data_length=REQUESTS_NUM;
+  req_arr.data=(int8_t*)malloc(sizeof(int8_t*)*REQUESTS_NUM);
 
-  //lines.data_length = SENSORGROUP_SUM;
-  //lines.data=(int8_t*)malloc(sizeof(int8_t*)*SENSORGROUP_SUM);
-  //lrfs.data_length = 6;
-  //lrfs.data=(float*)malloc(sizeof(float*)*6);
+  lines.data_length = SENSORGROUP_SUM;
+  lines.data=(int8_t*)malloc(sizeof(int8_t*)*SENSORGROUP_SUM);
+  lrfs.data_length = 6;
+  lrfs.data=(float*)malloc(sizeof(float*)*6);
   
-  //nh.initNode();
-  //nh.advertise(req_pub);
-  //nh.advertise(lrf_pub);
-  //nh.advertise(line_pub);*/
+  nh.initNode();
+  nh.advertise(req_pub);
+  nh.advertise(lrf_pub);
+  nh.advertise(line_pub);
 
   Serial.begin(9600);
 }
 
 
 void loop() {
-  //pairA->getDistance();
-  //pairB->getDistance();
+  pairA->getDistance();
+  pairB->getDistance();
 
-  //pairA->getAngle();
-  //pairB->getAngle();
+  pairA->getAngle();
+  pairB->getAngle();
 
-  /*Serial.print(pairA->distanceL);
+  Serial.print(pairA->distanceL);
   Serial.print(":");
     //Serial.print(pairA->distanceR);
   Serial.print("::");
@@ -269,14 +242,14 @@ void loop() {
   set_sensor_status();
   //sumup_weight();
   check_weight();
-  //set_publish_data();
-  //set_mecanum_requests();
-  //req_pub.publish(&req_arr);
+  set_publish_data();
+  set_mecanum_requests();
+  req_pub.publish(&req_arr);
   
-  //line_pub.publish(&lines);
-  //lrf_pub.publish(&lrfs);
+  line_pub.publish(&lines);
+  lrf_pub.publish(&lrfs);
 
-  //nh.spinOnce();*/
+  nh.spinOnce();
   delay(100);
   
 }

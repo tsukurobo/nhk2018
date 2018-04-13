@@ -8,7 +8,7 @@ LrfPair::LrfPair(int lsh, int rsh):
     this->reliability = false;
     this->angle = this->distanceL = this->distanceR = this->distance_avr = 0;
 
-    /*LSHUT = lsh;
+    LSHUT = lsh;
     RSHUT = rsh;
     
     pinMode(13,OUTPUT);
@@ -56,7 +56,7 @@ LrfPair::LrfPair(int lsh, int rsh):
  
     this->sensorL.startContinuous();
     this->sensorR.startContinuous();
-    digitalWrite(13,LOW);*/
+    digitalWrite(13,LOW);
 }
 
 
