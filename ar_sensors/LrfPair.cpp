@@ -24,7 +24,7 @@ LrfPair::LrfPair(int lsh, int rsh):
     delay(150);
     this->sensorL.init(true);
     delay(100);
-    this->sensorL.setAddress((uint8_t)(4*lsh));
+    this->sensorL.setAddress((uint8_t)(lsh));
     this->sensorL.setTimeout(500);
 
     pinMode(rsh, OUTPUT); 
@@ -37,7 +37,7 @@ LrfPair::LrfPair(int lsh, int rsh):
     delay(150);
     this->sensorR.init(true);
     delay(100);
-    this->sensorR.setAddress((uint8_t)(4*rsh));
+    this->sensorR.setAddress((uint8_t)(rsh));
     this->sensorR.setTimeout(500);
 
     #if defined LONG_RANGE //2200くらいまでレンジを広げる

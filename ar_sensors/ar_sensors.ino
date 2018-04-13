@@ -15,7 +15,7 @@
 #define LINE_THRESHOLD 800
 #define LINE_SENSOR_ALL_SUM 8 // LINE_SENSOR_AVR_SUM * 2
 #define SENSORGROUP_SUM 4//ラインセンサの基盤の数
-#define SENSORGROUP_SUMX 1
+#define LINE_SENSOR_THRESH 3 //ｎ以上のラインセンサが黒を検出したら参照しないようにする
 #define FW_GROUP 0 //正面方向のセンサ郡
 #define SD_GROUP 1 //側面方向のセンサ郡
 #define PARALLAX 100 //２つのセンサー視差。mm。
@@ -91,7 +91,7 @@ void init_vars(){//変数初期化
 }
 
 void set_sensor_status(){//各センサがライン上にいるか0or1で格納
-  for(int i=0;i<SENSORGROUP_SUMX;i++){
+  for(int i=0;i<SENSORGROUP_SUM;i++){
     for(int j=0;j<LINE_SENSOR_ALL_SUM;j++){
       if(line_sensor_value[i][j] < line_sensor_thresh[i])is_online[i][j] = false;
       else is_online[i][j] = true;
@@ -114,6 +114,7 @@ void sumup_weight(){//ロボット視点で左半分は負、右半分は正で�
 }
 
 void check_weight(){
+  int online_sum[SENSORGROUP_SUM] = {0,0,0,0};
   int max_weight_l[SENSORGROUP_SUM] = {0,0,0,0};
   int max_weight_r[SENSORGROUP_SUM] = {0,0,0,0};
   for(int i = 0; i<SENSORGROUP_SUM; i++){
@@ -124,11 +125,16 @@ void check_weight(){
         if(is_online[i][j] && max_weight_r[i] < weight_map[j])max_weight_r[i] = weight_map[j];
       }
       sensors_weight[i] = max_weight_l[i] + max_weight_r[i];
+      if(is_online[i][j]) online_sum[i]++;
     }
+  }
+
+  for(int i=0;i<SENSORGROUP_SUM;i++){
+    if(online_sum[i] >= LINE_SENSOR_THRESH)sensors_weight[i] = 0;
   }
 }
 
-void set_turn_req(float ang_a, float ang_b){//壁までの距離が一番近い面のみを参照して角度調整する。
+/*void set_turn_req(float ang_a, float ang_b){//壁までの距離が一番近い面のみを参照して角度調整する。
   if(pairA->reliability && !(pairB->reliability)){
     if(ang_a < -THRESHOLD)turn_req = CCW;
     else if(ang_a > THRESHOLD)turn_req = CW;
@@ -149,9 +155,9 @@ void set_turn_req(float ang_a, float ang_b){//壁までの距離が一番近い�
       else turn_req = 0;
     }
   }
-}
+}*/
 
-void set_fwsd_req(){
+/*void set_fwsd_req(){
   int fw_weight[2] = {0,0};
   int sd_weight[2] = {0,0};
   int fwcnt = 0;
@@ -172,16 +178,16 @@ void set_fwsd_req(){
 
   if(sd_weight[0] < 0 && sd_weight[1] < 0)fw_req = CCW;//側向きのラインセンサが踏むラインが左寄りのとき
   else if(sd_weight[0] > 0 && sd_weight[1] > 0)fw_req = CW;
-}
+}*/
 
-void set_mecanum_requests(){ 
+/*void set_mecanum_requests(){ 
   set_turn_req(pairA->angle,pairB->angle);
   set_fwsd_req();
 
   req_arr.data[FOWARD] = fw_req;
   req_arr.data[SIDE] = sd_req;
   req_arr.data[TURN] = turn_req;
-}
+}*/
 
 void set_publish_data(){
   for(int i=0;i<SENSORGROUP_SUM;i++){
@@ -228,11 +234,11 @@ void loop() {
 
   Serial.print(pairA->distanceL);
   Serial.print(":");
-    //Serial.print(pairA->distanceR);
+  Serial.print(pairA->distanceR);
   Serial.print("::");
-    //Serial.print(pairB->distanceL);
+  Serial.print(pairB->distanceL);
   Serial.print(":");
-    //Serial.println(pairB->distanceR);
+  Serial.println(pairB->distanceR);
   
   // put your main code here, to run repeatedly:*/
   
@@ -243,8 +249,8 @@ void loop() {
   //sumup_weight();
   check_weight();
   set_publish_data();
-  set_mecanum_requests();
-  req_pub.publish(&req_arr);
+  //set_mecanum_requests();
+  //req_pub.publish(&req_arr);
   
   line_pub.publish(&lines);
   lrf_pub.publish(&lrfs);
