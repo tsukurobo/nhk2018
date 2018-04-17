@@ -59,14 +59,14 @@ void setup() {
 #endif
  
   sensorL.startContinuous();
-  //sensorR.startContinuous();
+  sensorR.startContinuous();
   digitalWrite(13,LOW);
  
   Serial.begin(19200);
 }
  
 void loop(){
-  //R_distance = sensorR.readRangeContinuousMillimeters();
+  R_distance = sensorR.readRangeContinuousMillimeters();
   L_distance = sensorL.readRangeContinuousMillimeters();
   Serial.print("R:");
   Serial.print(R_distance);

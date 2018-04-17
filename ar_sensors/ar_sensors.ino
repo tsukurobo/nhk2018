@@ -10,7 +10,7 @@
 #include "std_msgs/Int16MultiArray.h"
 #include "std_msgs/Int8MultiArray.h"
 #include "std_msgs/Float32MultiArray.h"
-//#include <VL53L0X.h>
+#include <VL53L0X.h>
 
 #define LINE_THRESHOLD 800
 #define LINE_SENSOR_ALL_SUM 8 // LINE_SENSOR_AVR_SUM * 2
