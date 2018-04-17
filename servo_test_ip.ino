@@ -8,10 +8,10 @@
 #define g 5
 #define h 6
 
-#define OPEN 90
-#define CLOSE 0
-#define OPEN0 90
-#define CLOSE0 0
+#define OPEN 0
+#define CLOSE 90
+#define OPEN0 0
+#define CLOSE0 90
 
 Servo servos[7];
 int state[7] = {}; // open is 0, close is 1
@@ -51,7 +51,7 @@ void toggleServo(int servoNo) {
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  Serial.println('setup');
+  Serial.println("setup");
   setupServos();
   delay(1000);
 }
